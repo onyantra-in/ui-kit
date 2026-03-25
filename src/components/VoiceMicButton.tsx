@@ -1,5 +1,5 @@
 import { Mic, MicOff, Square } from 'lucide-react';
-import { useVoiceInput } from '@/hooks/useVoiceInput';
+import { useVoiceInput } from '../hooks/useVoiceInput';
 
 export interface VoiceMicButtonProps {
   /** Called when a transcript is successfully received */
