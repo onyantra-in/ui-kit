@@ -5,7 +5,8 @@
   "type": "module",
   "exports": {
     ".": "./src/index.ts",
-    "./globals.css": "./src/styles/globals.css"
+    "./globals.css": "./src/styles/globals.css",
+    "./tailwind.config.cjs": "./tailwind.config.cjs"
   },
   "main": "./src/index.ts",
   "types": "./src/index.ts",
@@ -23,9 +24,11 @@
   },
   "dependencies": {
     "@radix-ui/react-dialog": "^1.1.15",
+    "@radix-ui/react-label": "^2.1.8",
     "clsx": "^2.1.1",
     "framer-motion": "^12.23.24",
     "lucide-react": "^0.577.0",
+    "react-hook-form": "^7.72.0",
     "tailwind-merge": "^3.3.1"
   },
   "devDependencies": {

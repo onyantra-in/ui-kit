@@ -14,6 +14,8 @@ export type { SelectProps } from './components/Select';
 export { Textarea } from './components/Textarea';
 export type { TextareaProps } from './components/Textarea';
 
+export * as Form from './components/form';
+
 export { Badge } from './components/Badge';
 export type { BadgeProps } from './components/Badge';
 
