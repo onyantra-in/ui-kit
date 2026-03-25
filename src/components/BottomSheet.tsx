@@ -37,12 +37,12 @@ export function BottomSheet({ open, onClose, title, children, className }: Botto
               >
                 {/* Drag handle */}
                 <div className="flex justify-center pt-3 pb-1">
-                  <div className="w-10 h-1 rounded-full bg-border" />
+                  <div className="w-8 h-1 rounded-full bg-border" />
                 </div>
 
                 {title && (
                   <div className="flex items-center justify-between px-5 py-3 border-b border-border">
-                    <Dialog.Title className="text-lg font-semibold text-foreground">
+                    <Dialog.Title className="text-base font-semibold text-foreground">
                       {title}
                     </Dialog.Title>
                     <Dialog.Close asChild>
@@ -56,7 +56,7 @@ export function BottomSheet({ open, onClose, title, children, className }: Botto
                   </div>
                 )}
 
-                <div className="px-5 pb-8 pt-4">{children}</div>
+                <div className="px-4 pb-6 pt-3">{children}</div>
               </motion.div>
             </Dialog.Content>
           </Dialog.Portal>

@@ -16,10 +16,10 @@ const variantClasses: Record<string, string> = {
 };
 
 const sizeClasses: Record<string, string> = {
-  sm: 'h-8 px-3 text-xs rounded-md',
-  default: 'h-10 px-4 py-2 text-sm rounded-lg',
-  lg: 'h-12 px-6 text-base rounded-xl',
-  icon: 'h-10 w-10 rounded-lg',
+  sm: 'h-7 px-2.5 text-xs rounded',
+  default: 'h-8 px-3 py-1.5 text-sm rounded-sm',
+  lg: 'h-10 px-5 text-sm rounded-lg',
+  icon: 'h-8 w-8 rounded-sm',
 };
 
 const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
