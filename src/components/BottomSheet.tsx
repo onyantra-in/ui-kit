@@ -8,11 +8,15 @@ export interface BottomSheetProps {
   open: boolean;
   onClose: () => void;
   title?: string;
+  /** Optional node rendered in a fixed header area above the scrollable content. */
+  header?: React.ReactNode;
+  /** Optional node rendered in a fixed footer area below the scrollable content. */
+  footer?: React.ReactNode;
   children: React.ReactNode;
   className?: string;
 }
 
-export function BottomSheet({ open, onClose, title, children, className }: BottomSheetProps) {
+export function BottomSheet({ open, onClose, title, header, footer, children, className }: BottomSheetProps) {
   return (
     <Dialog.Root open={open} onOpenChange={(v) => !v && onClose()}>
       <AnimatePresence>
@@ -40,23 +44,36 @@ export function BottomSheet({ open, onClose, title, children, className }: Botto
                   <div className="w-8 h-1 rounded-full bg-border" />
                 </div>
 
-                {title && (
-                  <div className="flex items-center justify-between px-5 py-3 border-b border-border">
-                    <Dialog.Title className="text-base font-semibold text-foreground">
-                      {title}
-                    </Dialog.Title>
-                    <Dialog.Close asChild>
-                      <button
-                        className="touch-target flex items-center justify-center rounded-lg text-muted-foreground hover:bg-muted transition-colors"
-                        aria-label="Close"
-                      >
-                        <X size={20} />
-                      </button>
-                    </Dialog.Close>
+                {(title || header) && (
+                  <div className="flex-none">
+                    {title && (
+                      <div className="flex items-center justify-between px-5 py-3 border-b border-border">
+                        <Dialog.Title className="text-base font-semibold text-foreground">
+                          {title}
+                        </Dialog.Title>
+                        <Dialog.Close asChild>
+                          <button
+                            className="touch-target flex items-center justify-center rounded-lg text-muted-foreground hover:bg-muted transition-colors"
+                            aria-label="Close"
+                          >
+                            <X size={20} />
+                          </button>
+                        </Dialog.Close>
+                      </div>
+                    )}
+                    {header && (
+                      <div className="px-4 pt-3 border-b border-border">{header}</div>
+                    )}
                   </div>
                 )}
 
-                <div className="px-4 pb-6 pt-3">{children}</div>
+                <div className="flex-1 overflow-y-auto px-4 pb-6 pt-3">{children}</div>
+
+                {footer && (
+                  <div className="flex-none px-4 py-3 border-t border-border bg-card">
+                    {footer}
+                  </div>
+                )}
               </motion.div>
             </Dialog.Content>
           </Dialog.Portal>

@@ -63,13 +63,7 @@
     @apply fixed inset-0 z-50 bg-black/40 backdrop-blur-sm;
   }
   .bottom-sheet {
-    @apply fixed bottom-0 left-0 right-0 z-50 bg-card rounded-t-2xl shadow-panel max-h-[90dvh] overflow-y-auto;
-  }
-
-  /* Touch optimization — ensures interactive elements meet 44px minimum touch target */
-  .touch-target {
-    min-height: 44px;
-    min-width: 44px;
+    @apply fixed bottom-0 left-0 right-0 z-50 bg-card rounded-t-2xl shadow-panel max-h-[90dvh] flex flex-col overflow-hidden;
   }
 }
 

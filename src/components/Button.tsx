@@ -16,9 +16,9 @@ const variantClasses: Record<string, string> = {
 };
 
 const sizeClasses: Record<string, string> = {
-  sm: 'h-7 px-2.5 text-xs rounded',
-  default: 'h-8 px-3 py-1.5 text-sm rounded-sm',
-  lg: 'h-10 px-5 text-sm rounded-lg',
+  sm: 'h-7 px-2.5 text-xs rounded-sm',
+  default: 'h-8 p-4 p-4 text-sm rounded-sm',
+  lg: 'h-10 px-5 text-sm rounded-sm',
   icon: 'h-8 w-8 rounded-sm',
 };
 
