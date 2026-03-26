@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react';
-import { Button } from '../components/Button';
+import { Button } from '../components/base/button';
 
 const meta: Meta<typeof Button> = {
   title: 'Components/Button',
@@ -36,9 +36,12 @@ export const Disabled: Story = { args: { children: 'Disabled', disabled: true } 
 export const AllVariants: Story = {
   render: () => (
     <div className="flex flex-wrap gap-3">
-      {(['default', 'secondary', 'ghost', 'destructive', 'outline', 'link'] as const).map((v) => (
-        <Button key={v} variant={v}>{v}</Button>
-      ))}
+      <Button>Button</Button>
+      <Button variant="secondary">Secondary</Button>
+      <Button variant="destructive">Destructive</Button>
+      <Button variant="outline">Outline</Button>
+      <Button variant="ghost">Ghost</Button>
+      <Button variant="link">Link</Button>
     </div>
   ),
 };

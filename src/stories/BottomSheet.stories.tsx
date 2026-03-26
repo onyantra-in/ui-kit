@@ -1,9 +1,9 @@
 import { useState } from 'react';
 import type { Meta, StoryObj } from '@storybook/react';
 import { BottomSheet } from '../components/BottomSheet';
-import { Button } from '../components/Button';
-import { Input } from '../components/Input';
-import { Label } from '../components/Label';
+import { Button } from '../components/base/button';
+import { Input } from '../components/base/input';
+import { Label } from '../components/base/label';
 
 const meta: Meta<typeof BottomSheet> = {
   title: 'Components/BottomSheet',

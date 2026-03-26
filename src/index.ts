@@ -1,23 +1,45 @@
-// Components
-export { Button } from './components/Button';
-export type { ButtonProps } from './components/Button';
+// ─── Simple prop-driven wrappers ──────────────────────────────────────────────
+export { SimpleAlert } from './components/SimpleAlert';
+export type { SimpleAlertProps } from './components/SimpleAlert';
 
-export { Input } from './components/Input';
-export type { InputProps } from './components/Input';
+export { SimpleBadge } from './components/SimpleBadge';
+export type { SimpleBadgeProps } from './components/SimpleBadge';
 
-export { Label } from './components/Label';
-export type { LabelProps } from './components/Label';
+export { SimpleSelect } from './components/SimpleSelect';
+export type { SimpleSelectProps, SelectOption, SelectOptionGroup } from './components/SimpleSelect';
 
-export { Select } from './components/Select';
-export type { SelectProps } from './components/Select';
+export { LabeledInput } from './components/LabeledInput';
+export type { LabeledInputProps } from './components/LabeledInput';
 
-export { Textarea } from './components/Textarea';
-export type { TextareaProps } from './components/Textarea';
+export { LabeledTextarea } from './components/LabeledTextarea';
+export type { LabeledTextareaProps } from './components/LabeledTextarea';
 
-export * as Form from './components/form';
+export { LabeledSwitch } from './components/LabeledSwitch';
+export type { LabeledSwitchProps } from './components/LabeledSwitch';
 
-export { Badge } from './components/Badge';
-export type { BadgeProps } from './components/Badge';
+export { SimpleTooltip } from './components/SimpleTooltip';
+export type { SimpleTooltipProps } from './components/SimpleTooltip';
+
+export { SimpleDialog } from './components/SimpleDialog';
+export type { SimpleDialogProps } from './components/SimpleDialog';
+
+export { SimpleDrawer } from './components/SimpleDrawer';
+export type { SimpleDrawerProps } from './components/SimpleDrawer';
+
+export { SimpleAlertDialog } from './components/SimpleAlertDialog';
+export type { SimpleAlertDialogProps } from './components/SimpleAlertDialog';
+
+export { SimpleTabs } from './components/SimpleTabs';
+export type { SimpleTabsProps, TabItem } from './components/SimpleTabs';
+
+export { SimpleDropdownMenu } from './components/SimpleDropdownMenu';
+export type { SimpleDropdownMenuProps, MenuGroup, MenuItemDef } from './components/SimpleDropdownMenu';
+
+export { SimpleCombobox } from './components/SimpleCombobox';
+export type { SimpleComboboxProps, ComboboxOption } from './components/SimpleCombobox';
+
+// ─── Other components ─────────────────────────────────────────────────────────
+export * as Form from './components/Form';
 
 export { BottomSheet } from './components/BottomSheet';
 export type { BottomSheetProps } from './components/BottomSheet';
