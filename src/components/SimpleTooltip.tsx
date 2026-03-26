@@ -5,7 +5,7 @@ import {
   TooltipContent,
   TooltipProvider,
   TooltipTrigger,
-} from "@/components/base/tooltip";
+} from "./base/tooltip";
 
 export interface SimpleTooltipProps {
   content: ReactNode;

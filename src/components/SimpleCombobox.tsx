@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { CheckIcon, ChevronsUpDownIcon } from "lucide-react";
-import { Button } from "@/components/base/button";
+import { Button } from "./base/button";
 import {
   Command,
   CommandEmpty,
@@ -8,14 +8,14 @@ import {
   CommandInput,
   CommandItem,
   CommandList,
-} from "@/components/base/command";
-import { Label } from "@/components/base/label";
+} from "./base/command";
+import { Label } from "./base/label";
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
-} from "@/components/base/popover";
-import { cn } from "@/lib/utils";
+} from "./base/popover";
+import { cn } from "../lib/utils";
 
 export interface ComboboxOption {
   value: string;

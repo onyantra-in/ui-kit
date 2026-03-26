@@ -10,8 +10,8 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
   AlertDialogTrigger,
-} from "@/components/base/alert-dialog";
-import type { Button } from "@/components/base/button";
+} from "./base/alert-dialog";
+import type { Button } from "./base/button";
 
 export interface SimpleAlertDialogProps {
   trigger: ReactNode;

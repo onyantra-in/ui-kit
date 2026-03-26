@@ -1,5 +1,5 @@
 import type { ReactNode } from "react";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/base/tabs";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "./base/tabs";
 
 export interface TabItem {
   value: string;

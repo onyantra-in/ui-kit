@@ -4,14 +4,14 @@ import { Calendar as CalendarIcon } from "@mynaui/icons-react";
 import { format } from "date-fns";
 import * as React from "react";
 
-import { Button } from "@/components/base/button";
-import { Calendar } from "@/components/base/calendar";
+import { Button } from "./base/button";
+import { Calendar } from "./base/calendar";
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
-} from "@/components/base/popover";
-import { cn } from "@/lib/utils";
+} from "./base/popover";
+import { cn } from "../lib/utils";
 
 export default function Basic() {
   const [date, setDate] = React.useState<Date>();

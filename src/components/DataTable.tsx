@@ -1,8 +1,8 @@
 "use client";
 
-import { Badge } from "@/components/base/badge";
-import { Button } from "@/components/base/button";
-import { Input } from "@/components/base/input";
+import { Badge } from "./base/badge";
+import { Button } from "./base/button";
+import { Input } from "./base/input";
 import {
   Table,
   TableBody,
@@ -10,7 +10,7 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "@/components/base/table";
+} from "./base/table";
 import { Pencil, Trash } from "@mynaui/icons-react";
 import { useMemo, useState } from "react";
 

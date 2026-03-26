@@ -12,7 +12,7 @@ import {
   DropdownMenuSubContent,
   DropdownMenuSubTrigger,
   DropdownMenuTrigger,
-} from "@/components/base/dropdown-menu";
+} from "./base/dropdown-menu";
 
 export type MenuItemDef =
   | { type: "item"; label: ReactNode; icon?: ReactNode; shortcut?: string; variant?: "default" | "destructive"; onClick?: () => void; disabled?: boolean }

@@ -7,7 +7,7 @@ import {
   SelectSeparator,
   SelectTrigger,
   SelectValue,
-} from "@/components/base/select";
+} from "./base/select";
 
 export interface SelectOption {
   value: string;

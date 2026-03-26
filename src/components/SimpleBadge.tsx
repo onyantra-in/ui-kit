@@ -1,6 +1,6 @@
 import type { ReactNode } from "react";
-import { Badge } from "@/components/base/badge";
-import type { badgeVariants } from "@/components/base/badge";
+import { Badge } from "./base/badge";
+import type { badgeVariants } from "./base/badge";
 import type { VariantProps } from "class-variance-authority";
 
 export interface SimpleBadgeProps

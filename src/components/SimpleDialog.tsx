@@ -1,5 +1,5 @@
 import type { ReactNode } from "react";
-import { Button } from "@/components/base/button";
+import { Button } from "./base/button";
 import {
   Dialog,
   DialogClose,
@@ -9,7 +9,7 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from "@/components/base/dialog";
+} from "./base/dialog";
 
 export interface SimpleDialogProps {
   trigger: ReactNode;

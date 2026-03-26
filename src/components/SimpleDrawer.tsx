@@ -1,5 +1,5 @@
 import type { ReactNode } from "react";
-import { Button } from "@/components/base/button";
+import { Button } from "./base/button";
 import {
   Drawer,
   DrawerClose,
@@ -9,7 +9,7 @@ import {
   DrawerHeader,
   DrawerTitle,
   DrawerTrigger,
-} from "@/components/base/drawer";
+} from "./base/drawer";
 
 export interface SimpleDrawerProps {
   trigger: ReactNode;

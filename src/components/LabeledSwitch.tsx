@@ -1,6 +1,6 @@
 import type { ComponentProps } from "react";
-import { Switch } from "@/components/base/switch";
-import { Label } from "@/components/base/label";
+import { Switch } from "./base/switch";
+import { Label } from "./base/label";
 
 export interface LabeledSwitchProps extends ComponentProps<typeof Switch> {
   label?: string;

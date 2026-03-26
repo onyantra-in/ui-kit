@@ -1,6 +1,6 @@
 import type { ComponentProps } from "react";
-import { Label } from "@/components/base/label";
-import { Textarea } from "@/components/base/textarea";
+import { Label } from "./base/label";
+import { Textarea } from "./base/textarea";
 
 export interface LabeledTextareaProps extends ComponentProps<"textarea"> {
   label?: string;

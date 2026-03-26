@@ -1,6 +1,6 @@
 import type { ComponentProps } from "react";
-import { Input } from "@/components/base/input";
-import { Label } from "@/components/base/label";
+import { Input } from "./base/input";
+import { Label } from "./base/label";
 
 export interface LabeledInputProps extends ComponentProps<"input"> {
   label?: string;

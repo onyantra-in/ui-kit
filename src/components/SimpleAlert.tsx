@@ -1,5 +1,5 @@
 import type { ReactNode } from "react";
-import { Alert, AlertAction, AlertDescription, AlertTitle } from "@/components/base/alert";
+import { Alert, AlertAction, AlertDescription, AlertTitle } from "./base/alert";
 
 export interface SimpleAlertProps {
   title: string;
