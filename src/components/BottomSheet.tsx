@@ -14,9 +14,10 @@ export interface BottomSheetProps {
   footer?: React.ReactNode;
   children: React.ReactNode;
   className?: string;
+  contentClassName?: string;
 }
 
-export function BottomSheet({ open, onClose, title, header, footer, children, className }: BottomSheetProps) {
+export function BottomSheet({ open, onClose, title, header, footer, children, className, contentClassName }: BottomSheetProps) {
   return (
     <Dialog.Root open={open} onOpenChange={(v) => !v && onClose()}>
       <AnimatePresence>
@@ -67,7 +68,7 @@ export function BottomSheet({ open, onClose, title, header, footer, children, cl
                   </div>
                 )}
 
-                <div className="flex-1 overflow-y-auto px-4 pb-6 pt-3">{children}</div>
+                <div className={cn('flex-1 overflow-y-auto px-4 pb-6 pt-3', contentClassName)}>{children}</div>
 
                 {footer && (
                   <div className="flex-none px-4 py-3 border-t border-border bg-card">
