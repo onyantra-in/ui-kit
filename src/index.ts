@@ -41,9 +41,6 @@ export type { SimpleComboboxProps, ComboboxOption } from './components/SimpleCom
 // ─── Other components ─────────────────────────────────────────────────────────
 export * as Form from './components/Form';
 
-export { BottomSheet } from './components/BottomSheet';
-export type { BottomSheetProps } from './components/BottomSheet';
-
 export { VoiceMicButton } from './components/VoiceMicButton';
 export type { VoiceMicButtonProps } from './components/VoiceMicButton';
 
