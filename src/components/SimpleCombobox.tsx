@@ -55,7 +55,7 @@ export function SimpleCombobox({
           disabled={disabled}
           className="w-full"
         />
-        <ComboboxContent>
+        <ComboboxContent >
           <ComboboxList>
             <ComboboxCollection>
               {(option: ComboboxOption) => (

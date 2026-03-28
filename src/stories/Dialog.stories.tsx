@@ -1,5 +1,7 @@
+import { useState } from 'react';
 import type { Meta, StoryObj } from '@storybook/react';
 import { SimpleDialog } from '../components/SimpleDialog';
+import { SimpleCombobox } from '../components/SimpleCombobox';
 import { Button } from '../components/base/button';
 import { Input } from '../components/base/input';
 import { Label } from '../components/base/label';
@@ -27,25 +29,39 @@ export const Default: Story = {
 };
 
 export const WithForm: Story = {
-  render: () => (
-    <SimpleDialog
-      trigger={<Button>Edit profile</Button>}
-      title="Edit profile"
-      description="Make changes to your profile here. Click save when you're done."
-      footer={<Button>Save changes</Button>}
-    >
-      <div className="space-y-3">
-        <div className="space-y-1.5">
-          <Label htmlFor="name">Name</Label>
-          <Input id="name" defaultValue="Aditya Toshniwal" />
+  render: () => {
+    const [role, setRole] = useState('');
+    return (
+      <SimpleDialog
+        trigger={<Button>Edit profile</Button>}
+        title="Edit profile"
+        description="Make changes to your profile here. Click save when you're done."
+        footer={<Button>Save changes</Button>}
+      >
+        <div className="space-y-3">
+          <div className="space-y-1.5">
+            <Label htmlFor="name">Name</Label>
+            <Input id="name" defaultValue="Aditya Toshniwal" />
+          </div>
+          <div className="space-y-1.5">
+            <Label htmlFor="email">Email</Label>
+            <Input id="email" type="email" defaultValue="aditya@example.com" />
+          </div>
+          <SimpleCombobox
+            options={[
+              { value: 'admin', label: 'Admin' },
+              { value: 'editor', label: 'Editor' },
+              { value: 'viewer', label: 'Viewer' },
+            ]}
+            value={role}
+            onValueChange={setRole}
+            label="Role"
+            placeholder="Select role…"
+          />
         </div>
-        <div className="space-y-1.5">
-          <Label htmlFor="email">Email</Label>
-          <Input id="email" type="email" defaultValue="aditya@example.com" />
-        </div>
-      </div>
-    </SimpleDialog>
-  ),
+      </SimpleDialog>
+    );
+  },
 };
 
 export const OverflowingContent: Story = {
