@@ -15,10 +15,10 @@ import {
 } from "./base/dropdown-menu";
 
 export type MenuItemDef =
-  | { type: "item"; label: ReactNode; icon?: ReactNode; shortcut?: string; variant?: "default" | "destructive"; onClick?: () => void; disabled?: boolean }
+  | { type: "item"; label: ReactNode; icon?: ReactNode; shortcut?: string; variant?: "default" | "destructive"; onClick?: () => void; disabled?: boolean, extra?: any }
   | { type: "separator" }
   | { type: "label"; label: ReactNode }
-  | { type: "sub"; label: ReactNode; icon?: ReactNode; items: MenuItemDef[] };
+  | { type: "sub"; label: ReactNode; icon?: ReactNode; items: MenuItemDef[], extra?: any };
 
 export interface MenuGroup {
   label?: string;
@@ -45,6 +45,7 @@ function renderItem(item: MenuItemDef, index: number): ReactNode {
         <DropdownMenuPortal>
           <DropdownMenuSubContent>
             {item.items.map((sub, i) => renderItem(sub, i))}
+            {item.extra && <div className="ml-auto">{item.extra}</div>}
           </DropdownMenuSubContent>
         </DropdownMenuPortal>
       </DropdownMenuSub>
@@ -60,6 +61,7 @@ function renderItem(item: MenuItemDef, index: number): ReactNode {
       {item.icon}
       {item.label}
       {item.shortcut && <DropdownMenuShortcut>{item.shortcut}</DropdownMenuShortcut>}
+      {item.extra && <div className="ml-auto">{item.extra}</div>}
     </DropdownMenuItem>
   );
 }

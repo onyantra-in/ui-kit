@@ -48,5 +48,8 @@ export type { VoiceMicButtonProps } from './components/VoiceMicButton';
 export { useVoiceInput } from './hooks/useVoiceInput';
 export type { UseVoiceInputOptions, UseVoiceInputReturn } from './hooks/useVoiceInput';
 
+export { useDataGrid } from './hooks/use-data-grid';
+export { DataGrid } from "./components/data-grid/data-grid";
+
 // Utilities
 export { cn, stringToHsl, stringToHslPair, formatDate, getAge } from './lib/utils';

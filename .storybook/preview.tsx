@@ -1,5 +1,6 @@
 import type { Preview } from '@storybook/react';
 import '../src/styles/globals.css';
+import {TooltipProvider} from "@/components/base/tooltip";
 
 const preview: Preview = {
   parameters: {
@@ -22,7 +23,9 @@ const preview: Preview = {
       const isDark = context.globals.backgrounds?.value === 'hsl(222, 47%, 7%)';
       return (
         <div className={isDark ? 'dark' : ''} style={{ padding: '2rem' }}>
-          <Story />
+          <TooltipProvider>
+            <Story />
+          </TooltipProvider>
         </div>
       );
     },
