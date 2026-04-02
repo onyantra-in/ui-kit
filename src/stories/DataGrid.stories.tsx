@@ -1,9 +1,10 @@
 import type { Meta, StoryObj } from "@storybook/react";
 import * as React from "react";
 import { DataGrid } from "@/components/data-grid/data-grid";
-import { useDataGrid } from "./use-data-grid";
+import { useDataGrid } from "../hooks/use-data-grid";
 import type { ColumnDef } from "@tanstack/react-table";
-import { CheckCircle, XCircle, AlertCircle } from "lucide-react";
+import { CheckCircle, XCircle, AlertCircle, Pencil } from "lucide-react";
+import { Button } from "@/components/base";
 
 const meta: Meta<typeof DataGrid> = {
   title: "Components/DataGrid",
@@ -106,6 +107,7 @@ function BasicDataGridExample() {
         id: "name",
         accessorKey: "name",
         header: "Task",
+        size: 2000,
         meta: {
           cell: {
             variant: "short-text",
@@ -162,6 +164,16 @@ function BasicDataGridExample() {
           },
         },
       },
+      {
+        id: 'actions',
+        header: () => 'Actions',
+        size: 100,
+        cell: ({ row }) => (
+          <Button size="icon" variant="ghost">
+            <Pencil className="h-4 w-4" />
+          </Button>
+        ),
+      },
     ],
     [],
   );
@@ -173,6 +185,11 @@ function BasicDataGridExample() {
     getRowId: (row) => row.id,
     readOnly: true,
     enableRowSelection: true,
+    initialState: {
+      columnPinning: {
+        right: ["actions"],
+      },
+    },
   });
 
   return (

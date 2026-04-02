@@ -103,3 +103,39 @@ export const EmptyState: Story = {
     );
   },
 };
+
+export const Multiple: Story = {
+  render: () => {
+    const [values, setValues] = useState<string[]>([]);
+    return (
+      <div className="w-64">
+        <SimpleCombobox
+          multiple
+          options={frameworks}
+          value={values}
+          onValueChange={setValues}
+          label="Frameworks"
+          placeholder="Select frameworks…"
+        />
+      </div>
+    );
+  },
+};
+
+export const MultiplePreselected: Story = {
+  render: () => {
+    const [values, setValues] = useState<string[]>(['next', 'remix']);
+    return (
+      <div className="w-64">
+        <SimpleCombobox
+          multiple
+          options={frameworks}
+          value={values}
+          onValueChange={setValues}
+          label="Frameworks"
+          placeholder="Select frameworks…"
+        />
+      </div>
+    );
+  },
+};
