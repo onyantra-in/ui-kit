@@ -181,7 +181,7 @@ export function DataGrid<TData>({
                   >
                     {header.isPlaceholder ? null : typeof header.column
                         .columnDef.header === "function" ? (
-                      <div className="size-full px-3 py-1.5">
+                      <div className="size-full px-3 py-1.5 text-sm">
                         {flexRender(
                           header.column.columnDef.header,
                           header.getContext(),
@@ -259,7 +259,7 @@ export function DataGrid<TData>({
               <div
                 role="gridcell"
                 tabIndex={0}
-                className="relative flex h-9 grow items-center bg-muted/30 transition-colors hover:bg-muted/50 focus:bg-muted/50 focus:outline-none"
+                className="relative flex h-9 grow items-center bg-muted/30 transition-colors hover:bg-muted/50 focus:bg-muted/50 focus:outline-none text-sm"
                 style={{
                   width: table.getTotalSize(),
                   minWidth: table.getTotalSize(),

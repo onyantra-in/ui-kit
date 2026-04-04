@@ -259,7 +259,7 @@ function DataGridRowImpl<TData>({
               grow: stretchColumns && columnId !== "select",
               "border-e": showEndBorder && columnId !== "select",
               "border-s": showStartBorder && columnId !== "select",
-            })}
+            }, "text-sm")}
             style={{
               ...getColumnPinningStyle({ column: cell.column, dir }),
               width: `calc(var(--col-${columnId}-size) * 1px)`,
@@ -267,7 +267,7 @@ function DataGridRowImpl<TData>({
           >
             {typeof cell.column.columnDef.cell === "function" ? (
               <div
-                className={cn("size-full px-3 py-1.5", {
+                className={cn("size-full px-3 py-1.5 text-sm", {
                   "bg-primary/10": isRowSelected,
                 })}
               >
