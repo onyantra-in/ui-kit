@@ -23,7 +23,7 @@ interface DataGridProps<TData>
   extends Omit<ReturnType<typeof useDataGrid<TData>>, "dir">,
     Omit<React.ComponentProps<"div">, "contextMenu"> {
   dir?: Direction;
-  height?: number;
+  maxHeight?: string | null;
   stretchColumns?: boolean;
 }
 
@@ -50,7 +50,7 @@ export function DataGrid<TData>({
   contextMenu,
   pasteDialog,
   onRowAdd: onRowAddProp,
-  height = 600,
+  maxHeight,
   stretchColumns = false,
   adjustLayout = false,
   className,
@@ -94,7 +94,7 @@ export function DataGrid<TData>({
       data-slot="grid-wrapper"
       dir={dir}
       {...props}
-      className={cn("relative flex w-full flex-col", className)}
+      className={cn("relative flex w-full flex-col grow min-h-0", className)}
     >
       {searchState && <DataGridSearch {...searchState} />}
       <DataGridContextMenu
@@ -114,7 +114,7 @@ export function DataGrid<TData>({
         className="relative grid select-none overflow-auto rounded-md border focus:outline-none"
         style={{
           ...columnSizeVars,
-          maxHeight: `${height}px`,
+          maxHeight: maxHeight ? maxHeight : undefined,
         }}
         onContextMenu={onDataGridContextMenu}
       >
