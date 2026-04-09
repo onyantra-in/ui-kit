@@ -84,6 +84,27 @@ export const OverflowingContent: Story = {
   ),
 };
 
+export const WideDialog: Story = {
+  render: () => (
+    <SimpleDialog
+      trigger={<Button variant="outline">Open wide dialog</Button>}
+      title="Wide content dialog"
+      description="This dialog contains enough content to exceed the viewport width. The header and footer stay fixed while only the body scrolls."
+      footer={<Button>Save all</Button>}
+      contentClassName="md:max-w-4xl"
+    >
+      <div className="space-y-3">
+        {Array.from({ length: 20 }, (_, i) => (
+          <div key={i} className="space-y-1.5">
+            <Label htmlFor={`field-${i}`}>Field {i + 1}</Label>
+            <Input id={`field-${i}`} placeholder={`Enter value for field ${i + 1}`} />
+          </div>
+        ))}
+      </div>
+    </SimpleDialog>
+  ),
+};
+
 export const NoCloseButton: Story = {
   render: () => (
     <SimpleDialog

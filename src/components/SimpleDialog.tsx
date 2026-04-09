@@ -21,6 +21,7 @@ export interface SimpleDialogProps {
   open?: boolean;
   onOpenChange?: (open: boolean) => void;
   showCloseButton?: boolean;
+  contentClassName?: string;
 }
 
 export function SimpleDialog({
@@ -32,11 +33,12 @@ export function SimpleDialog({
   open,
   onOpenChange,
   showCloseButton = true,
+  contentClassName,
 }: SimpleDialogProps) {
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogTrigger asChild>{trigger}</DialogTrigger>
-      <DialogContent showCloseButton={showCloseButton}>
+      <DialogContent showCloseButton={showCloseButton} className={contentClassName}>
         <DialogHeader>
           <DialogTitle>{title}</DialogTitle>
           {description && <DialogDescription>{description}</DialogDescription>}
