@@ -38,7 +38,7 @@ export function SimpleDialog({
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogTrigger asChild>{trigger}</DialogTrigger>
-      <DialogContent showCloseButton={showCloseButton} className={contentClassName}>
+      <DialogContent showCloseButton={showCloseButton} className={contentClassName} onEscapeKeyDown={(e) => e.preventDefault()}>
         <DialogHeader>
           <DialogTitle>{title}</DialogTitle>
           {description && <DialogDescription>{description}</DialogDescription>}
