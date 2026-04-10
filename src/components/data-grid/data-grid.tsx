@@ -60,6 +60,7 @@ export function DataGrid<TData>({
   const readOnly = tableMeta?.readOnly ?? false;
   const columnVisibility = table.getState().columnVisibility;
   const columnPinning = table.getState().columnPinning;
+  const rowSelection = table.getState().rowSelection;
 
   const onRowAddRef = useAsRef(onRowAddProp);
 
@@ -238,6 +239,7 @@ export function DataGrid<TData>({
                 adjustLayout={adjustLayout}
                 stretchColumns={stretchColumns}
                 readOnly={readOnly}
+                isRowSelected={!!rowSelection[row.id]}
               />
             );
           })}

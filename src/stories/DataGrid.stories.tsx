@@ -533,3 +533,122 @@ function EmptyStateExample() {
 export const EmptyState: Story = {
   render: () => <EmptyStateExample />,
 };
+
+// ─── Row Click Selection ─────────────────────────────────────────────────────
+
+function RowClickSelectionExample() {
+  const [data, setData] = React.useState(initialTaskData);
+  const [selectedRows, setSelectedRows] = React.useState<string[]>([]);
+
+  const columns = React.useMemo<ColumnDef<Task>[]>(
+    () => [
+      {
+        id: "name",
+        accessorKey: "name",
+        header: "Task",
+        size: 300,
+        meta: { cell: { variant: "short-text" } },
+      },
+      {
+        id: "status",
+        accessorKey: "status",
+        header: "Status",
+        meta: {
+          cell: {
+            variant: "select",
+            options: [
+              { label: "To Do", value: "todo" },
+              { label: "In Progress", value: "in-progress" },
+              { label: "Completed", value: "completed" },
+            ],
+          },
+        },
+      },
+      {
+        id: "priority",
+        accessorKey: "priority",
+        header: "Priority",
+        meta: {
+          cell: {
+            variant: "select",
+            options: [
+              { label: "Low", value: "low" },
+              { label: "Medium", value: "medium" },
+              { label: "High", value: "high" },
+            ],
+          },
+        },
+      },
+      {
+        id: "assignee",
+        accessorKey: "assignee",
+        header: "Assignee",
+        meta: { cell: { variant: "short-text" } },
+      },
+      {
+        id: "estimate",
+        accessorKey: "estimate",
+        header: "Hours",
+        size: 90,
+        meta: { cell: { variant: "number", min: 0, max: 100 } },
+      },
+    ],
+    [],
+  );
+
+  const [lastAction, setLastAction] = React.useState<string>("");
+
+  const { table, ...dataGridProps } = useDataGrid({
+    data,
+    columns,
+    onDataChange: setData,
+    getRowId: (row) => row.id,
+    enableRowSelection: true,
+    enableRowClickSelection: true,
+    onRowKeyDown: (e, rowData) => {
+      const task = rowData as Task;
+      if (e.key === "Enter") {
+        e.preventDefault();
+        setLastAction(`Enter on "${task.name}"`);
+      } else if (e.key === "Delete" || e.key === "Backspace") {
+        e.preventDefault();
+        setLastAction(`Delete on "${task.name}"`);
+      }
+    },
+  });
+
+  React.useEffect(() => {
+    const selection = table.getState().rowSelection;
+    setSelectedRows(Object.keys(selection).filter((k) => selection[k]));
+  }, [table.getState().rowSelection]);
+
+  return (
+    <div style={{ padding: "20px" }}>
+      <p style={{ marginBottom: "8px", fontSize: "13px", color: "#666" }}>
+        <strong>Click</strong> a row to select · <strong>↑↓</strong> to navigate ·{" "}
+        <strong>Enter</strong> / <strong>Delete</strong> for custom actions · <strong>Esc</strong> to clear
+      </p>
+      <p style={{ marginBottom: "4px", fontSize: "13px" }}>
+        Selected: {selectedRows.length > 0 ? selectedRows.join(", ") : "—"}
+      </p>
+      <p style={{ marginBottom: "12px", fontSize: "13px", color: "#888" }}>
+        Last action: {lastAction || "—"}
+      </p>
+      <div style={{ height: "500px" }}>
+        <DataGrid table={table} {...dataGridProps} />
+      </div>
+    </div>
+  );
+}
+
+export const RowClickSelection: Story = {
+  render: () => <RowClickSelectionExample />,
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "Single row selection without checkboxes. Click a row to select it, use ↑↓ to navigate. Custom keyboard shortcuts via `onRowKeyDown`.",
+      },
+    },
+  },
+};

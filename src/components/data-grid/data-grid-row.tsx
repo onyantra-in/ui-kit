@@ -42,6 +42,7 @@ interface DataGridRowProps<TData> extends React.ComponentProps<"div"> {
   readOnly: boolean;
   stretchColumns: boolean;
   adjustLayout: boolean;
+  isRowSelected?: boolean;
 }
 
 export const DataGridRow = React.memo(DataGridRowImpl, (prev, next) => {
@@ -144,6 +145,11 @@ export const DataGridRow = React.memo(DataGridRowImpl, (prev, next) => {
     return false;
   }
 
+  // Re-render if row selection state changed (for row-click-selection mode)
+  if (prev.isRowSelected !== next.isRowSelected) {
+    return false;
+  }
+
   // Skip re-render - props are equal
   return true;
 }) as typeof DataGridRowImpl;
@@ -166,6 +172,7 @@ function DataGridRowImpl<TData>({
   readOnly,
   stretchColumns,
   adjustLayout,
+  isRowSelected: isRowSelectedProp,
   className,
   style,
   ref,
@@ -189,7 +196,7 @@ function DataGridRowImpl<TData>({
 
   const rowRef = useComposedRefs(ref, onRowChange);
 
-  const isRowSelected = row.getIsSelected();
+  const isRowSelected = isRowSelectedProp ?? row.getIsSelected();
 
   // Memoize visible cells to avoid recreating cell array on every render
   // Though TanStack returns new Cell wrappers, memoizing the array helps React's reconciliation
@@ -213,8 +220,15 @@ function DataGridRowImpl<TData>({
       className={cn(
         "absolute flex w-full border-b [content-visibility:auto]",
         !adjustLayout && "will-change-transform",
+        tableMeta?.onRowClickSelect && "cursor-pointer select-none",
+        tableMeta?.onRowClickSelect && isRowSelected && "ring-inset ring-1 ring-primary/60 bg-primary/5",
         className,
       )}
+      onClick={
+        tableMeta?.onRowClickSelect
+          ? (e) => tableMeta.onRowClickSelect!(row.id, e)
+          : undefined
+      }
       style={{
         height: `${getRowHeightValue(rowHeight)}px`,
         ...(adjustLayout
