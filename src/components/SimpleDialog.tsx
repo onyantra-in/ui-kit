@@ -1,4 +1,4 @@
-import type { ReactNode } from "react";
+import type { ReactNode, RefObject } from "react";
 import { Button } from "./base/button";
 import {
   Dialog,
@@ -22,6 +22,8 @@ export interface SimpleDialogProps {
   onOpenChange?: (open: boolean) => void;
   /** Called when the dialog is about to close. Return false to prevent closing. */
   onClose?: () => boolean | void;
+  /** Element to restore focus to when the dialog closes. */
+  restoreFocusRef?: RefObject<HTMLElement | null>;
   showCloseButton?: boolean;
   contentClassName?: string;
 }
@@ -35,11 +37,22 @@ export function SimpleDialog({
   open,
   onOpenChange,
   onClose,
+  restoreFocusRef,
   showCloseButton = true,
   contentClassName,
 }: SimpleDialogProps) {
   const handleClose = (e: Event) => {
     if (onClose?.() === false) e.preventDefault();
+  };
+
+  const handleCloseAutoFocus = (e: Event) => {
+    if (restoreFocusRef?.current) {
+      e.preventDefault();
+      const el = restoreFocusRef.current;
+      requestAnimationFrame(() => {
+        el.focus();
+      });
+    }
   };
 
   return (
@@ -50,6 +63,7 @@ export function SimpleDialog({
         className={contentClassName}
         onEscapeKeyDown={handleClose}
         onInteractOutside={handleClose}
+        onCloseAutoFocus={handleCloseAutoFocus}
       >
         <DialogHeader>
           <DialogTitle>{title}</DialogTitle>

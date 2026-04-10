@@ -5,6 +5,7 @@ import { useDataGrid } from "../hooks/use-data-grid";
 import type { ColumnDef } from "@tanstack/react-table";
 import { CheckCircle, XCircle, AlertCircle, Pencil } from "lucide-react";
 import { Button } from "@/components/base";
+import { SimpleDialog } from "@/components/SimpleDialog";
 
 const meta: Meta<typeof DataGrid> = {
   title: "Components/DataGrid",
@@ -648,6 +649,138 @@ export const RowClickSelection: Story = {
       description: {
         story:
           "Single row selection without checkboxes. Click a row to select it, use ↑↓ to navigate. Custom keyboard shortcuts via `onRowKeyDown`.",
+      },
+    },
+  },
+};
+
+// ─── Row Selection with Dialog ───────────────────────────────────────────────
+
+function RowSelectionWithDialogExample() {
+  const [data, setData] = React.useState(initialTaskData);
+  const [dialogOpen, setDialogOpen] = React.useState(false);
+  const [selectedTask, setSelectedTask] = React.useState<Task | null>(null);
+
+  const columns = React.useMemo<ColumnDef<Task>[]>(
+    () => [
+      {
+        id: "name",
+        accessorKey: "name",
+        header: "Task",
+        size: 300,
+        meta: { cell: { variant: "short-text" } },
+      },
+      {
+        id: "status",
+        accessorKey: "status",
+        header: "Status",
+        meta: {
+          cell: {
+            variant: "select",
+            options: [
+              { label: "To Do", value: "todo" },
+              { label: "In Progress", value: "in-progress" },
+              { label: "Completed", value: "completed" },
+            ],
+          },
+        },
+      },
+      {
+        id: "priority",
+        accessorKey: "priority",
+        header: "Priority",
+        meta: {
+          cell: {
+            variant: "select",
+            options: [
+              { label: "Low", value: "low" },
+              { label: "Medium", value: "medium" },
+              { label: "High", value: "high" },
+            ],
+          },
+        },
+      },
+      {
+        id: "assignee",
+        accessorKey: "assignee",
+        header: "Assignee",
+        meta: { cell: { variant: "short-text" } },
+      },
+    ],
+    [],
+  );
+
+  const { table, dataGridRef, ...dataGridProps } = useDataGrid({
+    data,
+    columns,
+    onDataChange: setData,
+    getRowId: (row) => row.id,
+    enableRowSelection: true,
+    onRowKeyDown: (e, rowData) => {
+      if (e.key === "Enter") {
+        e.preventDefault();
+        setSelectedTask(rowData as Task);
+        setDialogOpen(true);
+      }
+    },
+  });
+
+  return (
+    <div style={{ padding: "20px" }}>
+      <p style={{ marginBottom: "12px", fontSize: "13px", color: "#666" }}>
+        <strong>Click</strong> a row to select · <strong>Enter</strong> to open details · <strong>Esc</strong> to close dialog and return focus
+      </p>
+      <div style={{ height: "500px" }}>
+        <DataGrid table={table} dataGridRef={dataGridRef} {...dataGridProps} />
+      </div>
+      <SimpleDialog
+        trigger={<span />}
+        open={dialogOpen}
+        onOpenChange={setDialogOpen}
+        title={selectedTask?.name ?? ""}
+        restoreFocusRef={dataGridRef}
+        footer={
+          <Button variant="outline" onClick={() => setDialogOpen(false)}>
+            Close
+          </Button>
+        }
+      >
+        {selectedTask && (
+          <div style={{ fontSize: "13px", display: "flex", flexDirection: "column", gap: "12px" }}>
+            <div><strong>Status:</strong> {selectedTask.status}</div>
+            <div><strong>Priority:</strong> {selectedTask.priority}</div>
+            <div><strong>Assignee:</strong> {selectedTask.assignee}</div>
+            <div><strong>Due:</strong> {selectedTask.dueDate}</div>
+            <div><strong>Estimate:</strong> {selectedTask.estimate}h</div>
+            <div style={{ display: "flex", flexDirection: "column", gap: "4px" }}>
+              <label htmlFor="task-notes" style={{ fontWeight: 600 }}>Notes</label>
+              <input
+                id="task-notes"
+                type="text"
+                placeholder="Add a note..."
+                style={{
+                  border: "1px solid #e2e8f0",
+                  borderRadius: "6px",
+                  padding: "6px 10px",
+                  fontSize: "13px",
+                  outline: "none",
+                }}
+              />
+            </div>
+          </div>
+        )}
+      </SimpleDialog>
+    </div>
+  );
+}
+
+export const RowSelectionWithDialog: Story = {
+  render: () => <RowSelectionWithDialogExample />,
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "Press Enter on a selected row to open a detail dialog. Focus returns to the DataGrid when the dialog closes.",
       },
     },
   },
