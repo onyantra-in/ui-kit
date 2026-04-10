@@ -20,6 +20,8 @@ export interface SimpleDialogProps {
   footer?: ReactNode;
   open?: boolean;
   onOpenChange?: (open: boolean) => void;
+  /** Called when the dialog is about to close. Return false to prevent closing. */
+  onClose?: () => boolean | void;
   showCloseButton?: boolean;
   contentClassName?: string;
 }
@@ -32,13 +34,23 @@ export function SimpleDialog({
   footer,
   open,
   onOpenChange,
+  onClose,
   showCloseButton = true,
   contentClassName,
 }: SimpleDialogProps) {
+  const handleClose = (e: Event) => {
+    if (onClose?.() === false) e.preventDefault();
+  };
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogTrigger asChild>{trigger}</DialogTrigger>
-      <DialogContent showCloseButton={showCloseButton} className={contentClassName} onEscapeKeyDown={(e) => e.preventDefault()}>
+      <DialogContent
+        showCloseButton={showCloseButton}
+        className={contentClassName}
+        onEscapeKeyDown={handleClose}
+        onInteractOutside={handleClose}
+      >
         <DialogHeader>
           <DialogTitle>{title}</DialogTitle>
           {description && <DialogDescription>{description}</DialogDescription>}
