@@ -11,6 +11,7 @@ export * from './dropdown-menu';
 export * from './input';
 export * from './input-group';
 export * from './label';
+export * from './loader';
 export * from './popover';
 export * from './select';
 export * from './switch';

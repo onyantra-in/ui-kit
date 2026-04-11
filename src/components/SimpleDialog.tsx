@@ -50,7 +50,9 @@ export function SimpleDialog({
       e.preventDefault();
       const el = restoreFocusRef.current;
       requestAnimationFrame(() => {
-        el.focus();
+        requestAnimationFrame(() => {
+          el.focus();
+        });
       });
     }
   };
