@@ -1,4 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react';
+import * as React from 'react';
 import {
   Card,
   CardAction,
@@ -10,6 +11,7 @@ import {
 } from '../components/base/card';
 import { Button } from '../components/base/button';
 import { Badge } from '../components/base/badge';
+import { Loader } from '../components/base/loader';
 
 const meta: Meta<typeof Card> = {
   title: 'Components/Card',
@@ -77,4 +79,37 @@ export const HeaderOnly: Story = {
       </CardHeader>
     </Card>
   ),
+};
+
+function WithLoaderExample() {
+  const [loading, setLoading] = React.useState(false);
+
+  const simulate = () => {
+    setLoading(true);
+    setTimeout(() => setLoading(false), 2000);
+  };
+
+  return (
+    <div className="flex flex-col gap-4 w-80">
+      <Button variant="outline" onClick={simulate}>Simulate loading</Button>
+      <Loader loading={loading} text="Fetching data...">
+        <Card>
+          <CardHeader>
+            <CardTitle>Notifications</CardTitle>
+            <CardDescription>Manage your notification preferences.</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <p className="text-sm text-muted-foreground">You have 3 unread messages.</p>
+          </CardContent>
+          <CardFooter>
+            <Button className="w-full">Mark all read</Button>
+          </CardFooter>
+        </Card>
+      </Loader>
+    </div>
+  );
+}
+
+export const WithLoader: Story = {
+  render: () => <WithLoaderExample />,
 };

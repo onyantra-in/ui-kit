@@ -71,7 +71,7 @@ export function SimpleDialog({
           <DialogTitle>{title}</DialogTitle>
           {description && <DialogDescription>{description}</DialogDescription>}
         </DialogHeader>
-        <div className="flex-1 min-h-0 overflow-y-auto">{children}</div>
+        <div className="flex-1 min-h-0 overflow-y-auto p-1">{children}</div>
         <DialogFooter>
           {footer ?? (
             <DialogClose asChild>

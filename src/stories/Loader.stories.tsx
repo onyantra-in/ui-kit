@@ -16,6 +16,18 @@ const meta: Meta<typeof Loader> = {
 export default meta;
 type Story = StoryObj<typeof Loader>;
 
+export const Standalone: Story = {
+  args: {
+    loading: true,
+  },
+};
+
+export const StandaloneWithText: Story = {
+  args: {
+    text: "Loading...",
+  },
+};
+
 export const Default: Story = {
   args: {
     loading: true,

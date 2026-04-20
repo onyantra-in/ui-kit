@@ -13,6 +13,16 @@ export interface LoaderProps {
 export function Loader({ loading, text, className, children }: LoaderProps) {
   const isLoading = loading !== undefined ? loading : Boolean(text);
 
+  if (!children) {
+    if (!isLoading) return null;
+    return (
+      <div className={cn("flex flex-col items-center justify-center gap-2", className)}>
+        <LoaderIcon className="size-6 animate-spin text-muted-foreground" />
+        {text && <p className="text-sm text-muted-foreground">{text}</p>}
+      </div>
+    );
+  }
+
   if (!isLoading) return <>{children}</>;
 
   return (
