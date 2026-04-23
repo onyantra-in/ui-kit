@@ -2,6 +2,7 @@
 
 import { Plus } from "lucide-react";
 import * as React from "react";
+import { Loader } from "../base/loader";
 import { DataGridColumnHeader } from "../data-grid/data-grid-column-header";
 import { DataGridContextMenu } from "../data-grid/data-grid-context-menu";
 import { DataGridPasteDialog } from "../data-grid/data-grid-paste-dialog";
@@ -23,6 +24,7 @@ interface DataGridProps<TData>
   extends Omit<ReturnType<typeof useDataGrid<TData>>, "dir">,
     Omit<React.ComponentProps<"div">, "contextMenu"> {
   dir?: Direction;
+  loading?: boolean;
   maxHeight?: string | null;
   stretchColumns?: boolean;
 }
@@ -50,6 +52,7 @@ export function DataGrid<TData>({
   contextMenu,
   pasteDialog,
   onRowAdd: onRowAddProp,
+  loading,
   maxHeight,
   stretchColumns = false,
   adjustLayout = false,
@@ -203,9 +206,11 @@ export function DataGrid<TData>({
           className="relative grid"
           style={{
             height: `${virtualTotalSize}px`,
+            minHeight: loading ? "6rem" : undefined,
             contain: adjustLayout ? "layout paint" : "strict",
           }}
         >
+          <Loader loading={loading} text="Loading..." className="absolute inset-0 z-50 bg-background/60 backdrop-blur-[1px]" />
           {virtualItems.map((virtualItem) => {
             const row = rows[virtualItem.index];
             if (!row) return null;
