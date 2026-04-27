@@ -210,7 +210,7 @@ export function DataGrid<TData>({
             contain: adjustLayout ? "layout paint" : "strict",
           }}
         >
-          <Loader loading={loading} text="Loading..." className="absolute inset-0 z-50 bg-background/60 backdrop-blur-[1px]" />
+          <Loader text={loading ? "Loading..." : undefined} className="absolute inset-0 z-50 bg-background/60 backdrop-blur-[1px]" />
           {virtualItems.map((virtualItem) => {
             const row = rows[virtualItem.index];
             if (!row) return null;
