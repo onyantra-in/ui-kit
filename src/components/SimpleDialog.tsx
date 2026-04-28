@@ -12,7 +12,7 @@ import {
 } from "./base/dialog";
 
 export interface SimpleDialogProps {
-  trigger: ReactNode;
+  trigger?: ReactNode;
   title: string;
   description?: string;
   children?: ReactNode;
@@ -59,13 +59,15 @@ export function SimpleDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogTrigger asChild>{trigger}</DialogTrigger>
+      {trigger && <DialogTrigger asChild>{trigger}</DialogTrigger>}
       <DialogContent
         showCloseButton={showCloseButton}
         className={contentClassName}
         onEscapeKeyDown={handleClose}
-        onInteractOutside={handleClose}
+        onPointerDownOutside={(e) => e.preventDefault()}
+        onInteractOutside={(e) => e.preventDefault()}
         onCloseAutoFocus={handleCloseAutoFocus}
+        onFocusOutside={(e) => e.preventDefault()}
       >
         <DialogHeader>
           <DialogTitle>{title}</DialogTitle>
