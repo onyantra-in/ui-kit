@@ -4,6 +4,7 @@ import { Dialog as DialogPrimitive } from "radix-ui"
 import { cn } from "../../lib/utils"
 import { Button } from "./button"
 import { XIcon } from "lucide-react"
+import { FocusScope } from "@radix-ui/react-focus-scope";
 
 function Dialog({
   ...props
@@ -55,7 +56,8 @@ function DialogContent({
 }) {
   return (
     <DialogPortal>
-      <DialogOverlay />
+      <DialogOverlay onClick={(e)=>e.stopPropagation()} />
+      <FocusScope trapped={false}>
       <DialogPrimitive.Content
         data-slot="dialog-content"
         className={cn(
@@ -79,6 +81,7 @@ function DialogContent({
           </DialogPrimitive.Close>
         )}
       </DialogPrimitive.Content>
+      </FocusScope>
     </DialogPortal>
   )
 }
