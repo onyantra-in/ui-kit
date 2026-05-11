@@ -23,6 +23,7 @@ interface SimpleComboboxBaseProps {
   id?: string;
   className?: string;
   disabled?: boolean;
+  showClear?: boolean;
 }
 
 export interface SimpleComboboxSingleProps extends SimpleComboboxBaseProps {
@@ -48,6 +49,7 @@ export function SimpleCombobox(props: SimpleComboboxProps) {
     id,
     className,
     disabled,
+    showClear,
   } = props;
 
   if (props.multiple) {
@@ -70,7 +72,7 @@ export function SimpleCombobox(props: SimpleComboboxProps) {
           <ComboboxInput
             id={id}
             placeholder={inputPlaceholder}
-            showClear={value.length > 0}
+            showClear={showClear ?? value.length > 0}
             disabled={disabled}
             className="w-full"
           />
