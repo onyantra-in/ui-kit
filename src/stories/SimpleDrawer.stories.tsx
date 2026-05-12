@@ -1,3 +1,18 @@
+export const ScrollableContent: Story = {
+  render: () => (
+    <SimpleDrawer
+      trigger={<Button>Open scrollable drawer</Button>}
+      title="Scrollable Drawer"
+      description="This drawer demonstrates scrollable content with a sticky footer."
+    >
+      <div className="space-y-3">
+        {Array.from({ length: 30 }).map((_, i) => (
+          <LabeledInput key={i} label={`Field ${i + 1}`} placeholder={`Value ${i + 1}`} />
+        ))}
+      </div>
+    </SimpleDrawer>
+  ),
+};
 import type { Meta, StoryObj } from '@storybook/react';
 import { Button } from '../components/base/button';
 import { LabeledInput } from '../components/LabeledInput';
