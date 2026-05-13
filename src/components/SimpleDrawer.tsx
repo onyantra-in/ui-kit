@@ -30,7 +30,7 @@ export function SimpleDrawer({
   footer,
   open,
   onOpenChange,
-  maxHeight = "min(80dvh, 600px)",
+  maxHeight = "",
 }: SimpleDrawerProps) {
   return (
     // repositionInputs: vaul scrolls the focused input into view using the
@@ -40,7 +40,7 @@ export function SimpleDrawer({
       <DrawerContent>
         {/* dvh shrinks with the keyboard on Android + iOS 16+. On older iOS,
             vaul's repositionInputs ensures the focused field stays visible. */}
-        <div className="mx-auto w-full max-w-sm flex flex-col" style={{ maxHeight }}>
+        <div className="mx-auto w-full max-w-sm flex flex-col flex-1 min-h-0 " style={{ maxHeight }}>
           <DrawerHeader>
             <DrawerTitle>{title}</DrawerTitle>
             {description && <DrawerDescription>{description}</DrawerDescription>}
