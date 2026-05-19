@@ -1,4 +1,4 @@
-import { type ReactNode } from "react";
+import { type ReactNode, useEffect, useRef } from "react";
 import { Button } from "@onyantra-in/ui-kit/base";
 import {
   Drawer,
@@ -32,6 +32,17 @@ export function SimpleDrawer({
   onOpenChange,
   maxHeight = "",
 }: SimpleDrawerProps) {
+  const contentRef = useRef<HTMLDivElement | null>(null);
+
+  useEffect(() => {
+    if (!open) return;
+
+    const contentElement = contentRef.current;
+    if (!contentElement) return;
+
+    contentElement.scrollTop = 0;
+  }, [open]);
+
   return (
     // repositionInputs: vaul scrolls the focused input into view using the
     // Visual Viewport API, which works even on iOS where dvh doesn't shrink.
@@ -46,7 +57,7 @@ export function SimpleDrawer({
             {description && <DrawerDescription>{description}</DrawerDescription>}
           </DrawerHeader>
           {children && (
-            <div className="flex-1 overflow-y-auto p-4">
+            <div ref={contentRef} className="flex-1 overflow-y-auto p-4">
               {children}
             </div>
           )}
