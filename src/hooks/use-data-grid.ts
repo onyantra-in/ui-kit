@@ -3244,7 +3244,8 @@ function useDataGrid<TData>({
           const currentState = store.getState();
           if (
             currentState.selectionState.selectedCells.size > 0 ||
-            Object.keys(currentState.rowSelection).length > 0
+            (!propsRef.current.enableRowClickSelection &&
+              Object.keys(currentState.rowSelection).length > 0)
           ) {
             onSelectionClear();
           }
