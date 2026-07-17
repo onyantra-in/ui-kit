@@ -146,9 +146,13 @@ export function getColumnPinningStyle<TData>(params: {
   const isRtl = dir === "rtl";
 
   const leftPosition =
-    isPinned === "left" ? `${column.getStart("left")}px` : undefined;
+    isPinned === "left"
+      ? `calc(var(--pin-${column.id}-left) * 1px)`
+      : undefined;
   const rightPosition =
-    isPinned === "right" ? `${column.getAfter("right")}px` : undefined;
+    isPinned === "right"
+      ? `calc(var(--pin-${column.id}-right) * 1px)`
+      : undefined;
 
   return {
     boxShadow: withBorder

@@ -270,7 +270,10 @@ function DataGridRowImpl<TData>({
             data-slot="grid-cell"
             tabIndex={-1}
             className={cn({
-              grow: stretchColumns && columnId !== "select",
+              grow:
+                stretchColumns &&
+                columnId !== "select" &&
+                !cell.column.getIsPinned(),
               "border-e": showEndBorder && columnId !== "select",
               "border-s": showStartBorder && columnId !== "select",
             }, "text-sm")}
@@ -281,7 +284,7 @@ function DataGridRowImpl<TData>({
           >
             {typeof cell.column.columnDef.cell === "function" ? (
               <div
-                className={cn("size-full px-3 py-1.5 text-sm overflow-hidden text-ellipsis whitespace-nowrap", {
+                className={cn("size-full px-3 py-1.5 text-sm overflow-hidden text-ellipsis whitespace-nowrap relative", {
                   "bg-primary/10": isRowSelected,
                 })}
               >

@@ -128,14 +128,16 @@ export function DataGrid<TData>({
           ref={headerRef}
           className="sticky top-0 z-10 grid border-b bg-background"
         >
-          {table.getHeaderGroups().map((headerGroup, rowIndex) => (
+          {table.getHeaderGroups().map((headerGroup, rowIndex, headerGroups) => (
             <div
               key={headerGroup.id}
               role="row"
               aria-rowindex={rowIndex + 1}
               data-slot="grid-header-row"
               tabIndex={-1}
-              className="flex w-full"
+              className={cn("flex w-full", {
+                "border-b": rowIndex < headerGroups.length - 1,
+              })}
             >
               {headerGroup.headers.map((header, colIndex) => {
                 const sorting = table.getState().sorting;
@@ -172,7 +174,6 @@ export function DataGrid<TData>({
                     data-slot="grid-header-cell"
                     tabIndex={-1}
                     className={cn("relative font-medium", {
-                      grow: stretchColumns && header.column.id !== "select",
                       "border-e":
                         showEndBorder && header.column.id !== "select",
                       "border-s":
@@ -181,6 +182,12 @@ export function DataGrid<TData>({
                     style={{
                       ...getColumnPinningStyle({ column: header.column, dir }),
                       width: `calc(var(--header-${header.id}-size) * 1px)`,
+                      flexGrow:
+                        stretchColumns &&
+                        header.column.id !== "select" &&
+                        !header.column.getIsPinned()
+                          ? header.colSpan
+                          : undefined,
                     }}
                   >
                     {header.isPlaceholder ? null : typeof header.column

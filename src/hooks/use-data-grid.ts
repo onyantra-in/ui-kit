@@ -2224,9 +2224,17 @@ function useDataGrid<TData>({
     for (const header of headers) {
       colSizes[`--header-${header.id}-size`] = header.getSize();
       colSizes[`--col-${header.column.id}-size`] = header.column.getSize();
+      colSizes[`--pin-${header.column.id}-left`] =
+        header.column.getStart("left");
+      colSizes[`--pin-${header.column.id}-right`] =
+        header.column.getAfter("right");
     }
     return colSizes;
-  }, [table.getState().columnSizingInfo, table.getState().columnSizing]);
+  }, [
+    table.getState().columnSizingInfo,
+    table.getState().columnSizing,
+    table.getState().columnPinning,
+  ]);
 
   const isFirefox = React.useSyncExternalStore(
     React.useCallback(() => () => {}, []),
