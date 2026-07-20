@@ -60,6 +60,8 @@ declare module "@tanstack/react-table" {
   interface ColumnMeta<TData extends RowData, TValue> {
     label?: string;
     cell?: CellOpts;
+    /** Darkens the start/end border to mark this column as a column-group edge. */
+    groupBoundary?: "start" | "end" | "both";
   }
 
   // biome-ignore lint/correctness/noUnusedVariables: TData is used in the TableMeta interface

@@ -261,6 +261,10 @@ function DataGridRowImpl<TData>({
           isLastColumn,
         });
 
+        const groupBoundary = cell.column.columnDef.meta?.groupBoundary;
+        const isBoundaryEnd = groupBoundary === "end" || groupBoundary === "both";
+        const isBoundaryStart = groupBoundary === "start" || groupBoundary === "both";
+
         return (
           <div
             key={cell.id}
@@ -275,7 +279,9 @@ function DataGridRowImpl<TData>({
                 columnId !== "select" &&
                 !cell.column.getIsPinned(),
               "border-e": showEndBorder && columnId !== "select",
+              "border-e-foreground/50": isBoundaryEnd && showEndBorder && columnId !== "select",
               "border-s": showStartBorder && columnId !== "select",
+              "border-s-foreground/50": isBoundaryStart && showStartBorder && columnId !== "select",
             }, "text-sm")}
             style={{
               ...getColumnPinningStyle({ column: cell.column, dir }),

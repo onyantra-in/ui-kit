@@ -157,6 +157,10 @@ export function DataGrid<TData>({
                     isLastColumn,
                   });
 
+                const groupBoundary = header.column.columnDef.meta?.groupBoundary;
+                const isBoundaryEnd = groupBoundary === "end" || groupBoundary === "both";
+                const isBoundaryStart = groupBoundary === "start" || groupBoundary === "both";
+
                 return (
                   <div
                     key={header.id}
@@ -174,10 +178,10 @@ export function DataGrid<TData>({
                     data-slot="grid-header-cell"
                     tabIndex={-1}
                     className={cn("relative font-medium", {
-                      "border-e":
-                        showEndBorder && header.column.id !== "select",
-                      "border-s":
-                        showStartBorder && header.column.id !== "select",
+                      "border-e": showEndBorder && header.column.id !== "select",
+                      "border-e-foreground/50": isBoundaryEnd && showEndBorder && header.column.id !== "select",
+                      "border-s": showStartBorder && header.column.id !== "select",
+                      "border-s-foreground/50": isBoundaryStart && showStartBorder && header.column.id !== "select",
                     })}
                     style={{
                       ...getColumnPinningStyle({ column: header.column, dir }),
