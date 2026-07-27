@@ -32,9 +32,19 @@ export function SimpleDrawer({
   open,
   onOpenChange,
   maxHeight = "",
+  repositionInputs,
 }: SimpleDrawerProps) {
   return (
-    <Drawer open={open} onOpenChange={onOpenChange} repositionInputs={repositionInputs}>
+    // disablePreventScroll={false} despite the name: vaul's iOS scroll-lock
+    // guard is active whenever disablePreventScroll is true (the default),
+    // and it calls window.scrollTo(0, 0) on open — jumping the page to top
+    // the instant the drawer opens on iOS. false turns that guard off.
+    <Drawer
+      open={open}
+      onOpenChange={onOpenChange}
+      repositionInputs={repositionInputs}
+      disablePreventScroll={false}
+    >
       <DrawerTrigger asChild>{trigger}</DrawerTrigger>
       <DrawerContent>
         <div className="mx-auto w-full max-w-sm flex flex-col flex-1 min-h-0 " style={{ maxHeight }}>
