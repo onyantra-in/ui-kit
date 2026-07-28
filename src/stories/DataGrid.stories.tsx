@@ -6,6 +6,7 @@ import type { ColumnDef } from "@tanstack/react-table";
 import { CheckCircle, XCircle, AlertCircle, Pencil } from "lucide-react";
 import { Button } from "@/components/base";
 import { SimpleDialog } from "@/components/SimpleDialog";
+import type { FileCellData } from "@/types/data-grid";
 
 const meta: Meta<typeof DataGrid> = {
   title: "Components/DataGrid",
@@ -32,6 +33,7 @@ interface Task {
   completed: boolean;
   url: string;
   estimate: number;
+  files?: FileCellData[];
 }
 
 const initialTaskData: Task[] = [
@@ -46,6 +48,7 @@ const initialTaskData: Task[] = [
     completed: false,
     url: "https://github.com/project/issues/1",
     estimate: 8,
+    files: [],
   },
   {
     id: "2",
@@ -58,6 +61,7 @@ const initialTaskData: Task[] = [
     completed: true,
     url: "https://figma.com/file/abc123",
     estimate: 5,
+    files: [],
   },
   {
     id: "3",
@@ -70,6 +74,7 @@ const initialTaskData: Task[] = [
     completed: false,
     url: "https://github.com/project/issues/3",
     estimate: 13,
+    files: [],
   },
   {
     id: "4",
@@ -82,6 +87,7 @@ const initialTaskData: Task[] = [
     completed: false,
     url: "https://docs.example.com",
     estimate: 3,
+    files: [],
   },
   {
     id: "5",
@@ -94,6 +100,7 @@ const initialTaskData: Task[] = [
     completed: false,
     url: "https://github.com/project/issues/5",
     estimate: 8,
+    files: [],
   },
 ];
 
@@ -206,15 +213,20 @@ export const Basic: Story = {
 
 // ─── Rich Cell Variants ───────────────────────────────────────────────────────
 
-function RichCellVariantsExample() {
-  const [data, setData] = React.useState(initialTaskData);
+type RichTask = Omit<Task, "priority"> & { priority: string[] };
 
-  const columns = React.useMemo<ColumnDef<Task>[]>(
+function RichCellVariantsExample() {
+  const [data, setData] = React.useState<RichTask[]>(() =>
+    initialTaskData.map((task) => ({ ...task, priority: [task.priority] })),
+  );
+
+  const columns = React.useMemo<ColumnDef<RichTask>[]>(
     () => [
       {
         id: "completed",
         accessorKey: "completed",
         header: "Done",
+        cell: undefined,
         meta: {
           cell: {
             variant: "checkbox",
@@ -226,6 +238,7 @@ function RichCellVariantsExample() {
         id: "name",
         accessorKey: "name",
         header: "Task Name",
+        cell: undefined,
         meta: {
           cell: {
             variant: "short-text",
@@ -236,6 +249,7 @@ function RichCellVariantsExample() {
         id: "description",
         accessorKey: "description",
         header: "Description",
+        cell: undefined,
         meta: {
           cell: {
             variant: "long-text",
@@ -247,6 +261,7 @@ function RichCellVariantsExample() {
         id: "status",
         accessorKey: "status",
         header: "Status",
+        cell: undefined,
         meta: {
           cell: {
             variant: "select",
@@ -262,6 +277,7 @@ function RichCellVariantsExample() {
         id: "priority",
         accessorKey: "priority",
         header: "Priority",
+        cell: undefined,
         meta: {
           cell: {
             variant: "multi-select",
@@ -277,6 +293,7 @@ function RichCellVariantsExample() {
         id: "estimate",
         accessorKey: "estimate",
         header: "Hours",
+        cell: undefined,
         meta: {
           cell: {
             variant: "number",
@@ -288,9 +305,28 @@ function RichCellVariantsExample() {
         size: 100,
       },
       {
+        id: "assignee",
+        accessorKey: "assignee",
+        header: "Assignee",
+        cell: undefined,
+        meta: {
+          cell: {
+            variant: "combobox",
+            options: [
+              { label: "Alice Johnson", value: "Alice Johnson" },
+              { label: "Bob Smith", value: "Bob Smith" },
+              { label: "Carol White", value: "Carol White" },
+              { label: "David Brown", value: "David Brown" },
+              { label: "Eve Davis", value: "Eve Davis" },
+            ],
+          },
+        },
+      },
+      {
         id: "dueDate",
         accessorKey: "dueDate",
         header: "Due Date",
+        cell: undefined,
         meta: {
           cell: {
             variant: "date",
@@ -301,11 +337,26 @@ function RichCellVariantsExample() {
         id: "url",
         accessorKey: "url",
         header: "Link",
+        cell: undefined,
         meta: {
           cell: {
             variant: "url",
           },
         },
+      },
+      {
+        id: "files",
+        accessorKey: "files",
+        header: "Attachments",
+        cell: undefined,
+        meta: {
+          cell: {
+            variant: "file",
+            maxFiles: 5,
+            maxFileSize: 5 * 1024 * 1024,
+          },
+        },
+        size: 220,
       },
     ],
     [],
@@ -316,6 +367,28 @@ function RichCellVariantsExample() {
     columns,
     onDataChange: setData,
     getRowId: (row) => row.id,
+    enableRowClickSelection: false,
+    onRowAdd: () => {
+      const newRow: RichTask = {
+        id: String(Date.now()),
+        name: "",
+        description: "",
+        status: "todo",
+        priority: [],
+        assignee: "",
+        dueDate: "",
+        completed: false,
+        url: "",
+        estimate: 0,
+        files: [],
+      };
+      setData((prev) => [...prev, newRow]);
+      return { rowIndex: data.length, columnId: "name" };
+    },
+    onRowsDelete: (rows) => {
+      const idsToDelete = new Set(rows.map((row) => row.id));
+      setData((prev) => prev.filter((row) => !idsToDelete.has(row.id)));
+    },
   });
 
   return (

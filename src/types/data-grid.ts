@@ -33,6 +33,10 @@ export type CellOpts =
       options: CellSelectOption[];
     }
   | {
+      variant: "combobox";
+      options: CellSelectOption[];
+    }
+  | {
       variant: "checkbox";
     }
   | {

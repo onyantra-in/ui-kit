@@ -24,6 +24,7 @@ interface SimpleComboboxBaseProps {
   className?: string;
   disabled?: boolean;
   showClear?: boolean;
+  defaultOpen?: boolean;
 }
 
 export interface SimpleComboboxSingleProps extends SimpleComboboxBaseProps {
@@ -50,6 +51,7 @@ export function SimpleCombobox(props: SimpleComboboxProps) {
     className,
     disabled,
     showClear,
+    defaultOpen,
   } = props;
 
   if (props.multiple) {
@@ -67,6 +69,7 @@ export function SimpleCombobox(props: SimpleComboboxProps) {
           multiple
           items={options}
           value={selectedOptions}
+          defaultOpen={defaultOpen}
           onValueChange={(opts) => onValueChange?.((opts ?? []).map((o) => o.value))}
         >
           <ComboboxInput
@@ -102,6 +105,7 @@ export function SimpleCombobox(props: SimpleComboboxProps) {
       <Combobox
         items={options}
         value={selectedOption}
+        defaultOpen={defaultOpen}
         onValueChange={(opt) => onValueChange?.(opt?.value ?? "")}
       >
         <ComboboxInput
