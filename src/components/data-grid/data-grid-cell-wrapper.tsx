@@ -1,6 +1,7 @@
 "use client";
 
 import * as React from "react";
+import { useDataGridPresence } from "../data-grid/data-grid-presence";
 import { useComposedRefs } from "../../lib/compose-refs";
 import { getCellKey } from "../../lib/data-grid";
 import { cn } from "../../lib/utils";
@@ -28,6 +29,7 @@ export function DataGridCellWrapper<TData>({
   ...props
 }: DataGridCellWrapperProps<TData>) {
   const cellMapRef = tableMeta?.cellMapRef;
+  const cellPresence = useDataGridPresence(getCellKey(rowIndex, columnId));
 
   const onCellChange = React.useCallback(
     (node: HTMLDivElement | null) => {
@@ -80,12 +82,12 @@ export function DataGridCellWrapper<TData>({
 
   const onDoubleClick = React.useCallback(
     (event: React.MouseEvent) => {
-      if (!isEditing) {
+      if (!isEditing && !readOnly) {
         event.preventDefault();
         tableMeta?.onCellDoubleClick?.(rowIndex, columnId);
       }
     },
-    [tableMeta, rowIndex, columnId, isEditing],
+    [tableMeta, rowIndex, columnId, isEditing, readOnly],
   );
 
   const onKeyDown = React.useCallback(
@@ -169,17 +171,20 @@ export function DataGridCellWrapper<TData>({
       data-editing={isEditing ? "" : undefined}
       data-focused={isFocused ? "" : undefined}
       data-selected={isSelected ? "" : undefined}
+      data-readonly={readOnly ? "" : undefined}
       tabIndex={isFocused && !isEditing ? 0 : -1}
       {...props}
       ref={composedRef}
       className={cn(
         "size-full px-2 py-1.5 text-start text-sm outline-none has-data-[slot=checkbox]:pt-2.5",
         {
-          "ring-1 ring-ring ring-inset": isFocused,
+          "ring-1 ring-inset": isFocused || !!cellPresence,
+          "ring-ring": isFocused && !cellPresence,
           "bg-yellow-100 dark:bg-yellow-900/30":
             isSearchMatch && !isActiveSearchMatch,
           "bg-orange-200 dark:bg-orange-900/50": isActiveSearchMatch,
           "bg-primary/10": isSelected && !isEditing,
+          "bg-muted": readOnly && !isSelected && !isSearchMatch,
           "cursor-default": !isEditing,
           "**:data-[slot=grid-cell-content]:line-clamp-1":
             !isEditing && rowHeight === "short",
@@ -192,6 +197,11 @@ export function DataGridCellWrapper<TData>({
         },
         className,
       )}
+      style={
+        cellPresence
+          ? ({ "--tw-ring-color": cellPresence.color } as React.CSSProperties)
+          : undefined
+      }
       onClick={onClick}
       onContextMenu={onContextMenu}
       onDoubleClick={onDoubleClick}

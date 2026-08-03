@@ -50,6 +50,10 @@ export type { UseVoiceInputOptions, UseVoiceInputReturn } from './hooks/useVoice
 
 export { useDataGrid } from './hooks/use-data-grid';
 export { DataGrid } from "./components/data-grid/data-grid";
+export {
+  DataGridPresenceProvider,
+  type DataGridCellPresence,
+} from "./components/data-grid/data-grid-presence";
 
 // Utilities
 export { cn, stringToHsl, stringToHslPair, formatDate, getAge } from './lib/utils';

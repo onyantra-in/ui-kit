@@ -13,7 +13,7 @@ import {
 } from "../base/dialog";
 import { useAsRef } from "../../hooks/use-as-ref";
 import { cn } from "../../lib/utils";
-import type { PasteDialogState } from "../data-grid/data-grid";
+import type { PasteDialogState } from "../../types/data-grid";
 
 interface DataGridPasteDialogProps<TData> {
   tableMeta: TableMeta<TData>;

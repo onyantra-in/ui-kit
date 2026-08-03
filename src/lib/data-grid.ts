@@ -25,7 +25,7 @@ import type {
   Direction,
   FileCellData,
   RowHeightValue,
-} from "@/components/data-grid/data-grid";
+} from "@/types/data-grid";
 
 export function flexRender<TProps extends object>(
   Comp: ((props: TProps) => React.ReactNode) | string | undefined,
@@ -146,13 +146,9 @@ export function getColumnPinningStyle<TData>(params: {
   const isRtl = dir === "rtl";
 
   const leftPosition =
-    isPinned === "left"
-      ? `calc(var(--pin-${column.id}-left) * 1px)`
-      : undefined;
+    isPinned === "left" ? `${column.getStart("left")}px` : undefined;
   const rightPosition =
-    isPinned === "right"
-      ? `calc(var(--pin-${column.id}-right) * 1px)`
-      : undefined;
+    isPinned === "right" ? `${column.getAfter("right")}px` : undefined;
 
   return {
     boxShadow: withBorder
@@ -331,7 +327,7 @@ export function parseTsv(
     return rows;
   }
 
-  const lines = text.split("\n");
+  const lines = text.split("\n").map((l) => l.replace(/\r$/, ""));
   let maxTabCount = 0;
   for (const line of lines) {
     const n = countTabs(line);
@@ -414,7 +410,8 @@ export function getEmptyCellValue(
   variant: CellOpts["variant"] | undefined,
 ): unknown {
   if (variant === "multi-select" || variant === "file") return [];
-  if (variant === "number" || variant === "date") return null;
+  if (variant === "number" || variant === "date" || variant === "select")
+    return null;
   if (variant === "checkbox") return false;
   return "";
 }

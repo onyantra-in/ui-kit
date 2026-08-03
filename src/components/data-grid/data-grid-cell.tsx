@@ -7,6 +7,7 @@ import {
   ComboboxCell,
   DateCell,
   FileCell,
+  IntCell,
   LongTextCell,
   MultiSelectCell,
   NumberCell,
@@ -14,7 +15,7 @@ import {
   ShortTextCell,
   UrlCell,
 } from "../data-grid/data-grid-cell-variants";
-import type { DataGridCellProps } from "../data-grid/data-grid";
+import type { DataGridCellProps } from "../../types/data-grid";
 
 export const DataGridCell = React.memo(DataGridCellImpl, (prev, next) => {
   // Fast path: check stable primitive props first
@@ -73,6 +74,9 @@ function DataGridCellImpl<TData>({
       break;
     case "number":
       Comp = NumberCell;
+      break;
+    case "int":
+      Comp = IntCell;
       break;
     case "url":
       Comp = UrlCell;

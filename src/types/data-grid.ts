@@ -11,7 +11,7 @@ export interface CellSelectOption {
   count?: number;
 }
 
-export type CellOpts =
+export type CellOpts<TData = unknown> =
   | {
       variant: "short-text";
     }
@@ -25,16 +25,35 @@ export type CellOpts =
       step?: number;
     }
   | {
+      variant: "int";
+      min?: number;
+      max?: number;
+      step?: number;
+    }
+  | {
       variant: "select";
       options: CellSelectOption[];
     }
   | {
       variant: "multi-select";
-      options: CellSelectOption[];
+      /**
+       * Static list, or a function of the row (and its index) for options that
+       * depend on that row's own data — mirrors the "combobox" variant so
+       * candidates can depend on sibling fields on the same row (or, via an
+       * outside ref, on values already claimed by other cells in the grid).
+       */
+      options: CellSelectOption[] | ((row: TData, rowIndex: number) => CellSelectOption[]);
     }
   | {
       variant: "combobox";
-      options: CellSelectOption[];
+      /**
+       * Static list, or a function of the row (and its index) for options that
+       * depend on that row's own data — e.g. a design-number column whose
+       * choices depend on which quality that same row picked. Called fresh on
+       * every render of that row's cell, so it can also read outside state
+       * (via a ref) to exclude values already claimed by sibling rows.
+       */
+      options: CellSelectOption[] | ((row: TData, rowIndex: number) => CellSelectOption[]);
     }
   | {
       variant: "checkbox";
@@ -63,9 +82,11 @@ declare module "@tanstack/react-table" {
   // biome-ignore lint/correctness/noUnusedVariables: TData and TValue are used in the ColumnMeta interface
   interface ColumnMeta<TData extends RowData, TValue> {
     label?: string;
-    cell?: CellOpts;
+    cell?: CellOpts<TData>;
     /** Darkens the start/end border to mark this column as a column-group edge. */
     groupBoundary?: "start" | "end" | "both";
+    /** Makes this column non-editable regardless of the grid's readOnly setting. */
+    readOnly?: boolean;
   }
 
   // biome-ignore lint/correctness/noUnusedVariables: TData is used in the TableMeta interface
@@ -80,6 +101,11 @@ declare module "@tanstack/react-table" {
     getIsSearchMatch?: (rowIndex: number, columnId: string) => boolean;
     getIsActiveSearchMatch?: (rowIndex: number, columnId: string) => boolean;
     getVisualRowIndex?: (rowId: string) => number | undefined;
+    scrollToCell?: (
+      rowIndex: number,
+      columnId: string,
+      align?: "auto" | "start" | "center" | "end",
+    ) => void;
     rowHeight?: RowHeightValue;
     onRowHeightChange?: (value: RowHeightValue) => void;
     onRowSelect?: (rowId: string, checked: boolean, shiftKey: boolean) => void;

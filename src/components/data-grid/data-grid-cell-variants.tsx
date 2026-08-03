@@ -25,6 +25,7 @@ import {
 import {
   Select,
   SelectContent,
+  SelectGroup,
   SelectItem,
   SelectTrigger,
   SelectValue,
@@ -127,6 +128,7 @@ export function ShortTextCell<TData>({
         }
       } else if (
         isFocused &&
+        !readOnly &&
         event.key.length === 1 &&
         !event.ctrlKey &&
         !event.metaKey
@@ -147,7 +149,7 @@ export function ShortTextCell<TData>({
         });
       }
     },
-    [isEditing, isFocused, initialValue, tableMeta, rowIndex, columnId],
+    [isEditing, isFocused, readOnly, initialValue, tableMeta, rowIndex, columnId],
   );
 
   React.useEffect(() => {
@@ -433,14 +435,18 @@ export function NumberCell<TData>({
   const prevIsEditingRef = React.useRef(false);
 
   const prevInitialValueRef = React.useRef(initialValue);
-  if (initialValue !== prevInitialValueRef.current) {
+  if (!Object.is(initialValue, prevInitialValueRef.current)) {
     prevInitialValueRef.current = initialValue;
     setValue(String(initialValue ?? ""));
   }
 
   const onBlur = React.useCallback(() => {
     const numValue = value === "" ? null : Number(value);
-    if (!readOnly && numValue !== initialValue) {
+    if (
+      !readOnly &&
+      !Number.isNaN(numValue) &&
+      !Object.is(numValue, initialValue)
+    ) {
       tableMeta?.onDataUpdate?.({ rowIndex, columnId, value: numValue });
     }
     tableMeta?.onCellEditingStop?.();
@@ -459,14 +465,14 @@ export function NumberCell<TData>({
         if (event.key === "Enter") {
           event.preventDefault();
           const numValue = value === "" ? null : Number(value);
-          if (numValue !== initialValue) {
+          if (!Number.isNaN(numValue) && !Object.is(numValue, initialValue)) {
             tableMeta?.onDataUpdate?.({ rowIndex, columnId, value: numValue });
           }
           tableMeta?.onCellEditingStop?.({ moveToNextRow: true });
         } else if (event.key === "Tab") {
           event.preventDefault();
           const numValue = value === "" ? null : Number(value);
-          if (numValue !== initialValue) {
+          if (!Number.isNaN(numValue) && !Object.is(numValue, initialValue)) {
             tableMeta?.onDataUpdate?.({ rowIndex, columnId, value: numValue });
           }
           tableMeta?.onCellEditingStop?.({
@@ -477,17 +483,30 @@ export function NumberCell<TData>({
           setValue(String(initialValue ?? ""));
           inputRef.current?.blur();
         }
-      } else if (isFocused) {
+      } else if (isFocused && !readOnly) {
         // Handle Backspace to start editing with empty value
         if (event.key === "Backspace") {
           setValue("");
-        } else if (event.key.length === 1 && !event.ctrlKey && !event.metaKey) {
+        } else if (
+          /^[0-9.-]$/.test(event.key) &&
+          !event.ctrlKey &&
+          !event.metaKey
+        ) {
           // Handle typing to pre-fill the value when editing starts
           setValue(event.key);
         }
       }
     },
-    [isEditing, isFocused, initialValue, tableMeta, rowIndex, columnId, value],
+    [
+      isEditing,
+      isFocused,
+      readOnly,
+      initialValue,
+      tableMeta,
+      rowIndex,
+      columnId,
+      value,
+    ],
   );
 
   React.useEffect(() => {
@@ -519,6 +538,152 @@ export function NumberCell<TData>({
       {isEditing ? (
         <Input
           type="number"
+          ref={inputRef}
+          value={value}
+          min={min}
+          max={max}
+          step={step}
+          className="h-full w-full rounded-none border-none bg-transparent p-0 shadow-none outline-none focus-visible:ring-0 [appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
+          onBlur={onBlur}
+          onChange={onChange}
+        />
+      ) : (
+        <span data-slot="grid-cell-content">{value}</span>
+      )}
+    </DataGridCellWrapper>
+  );
+}
+
+export function IntCell<TData>({
+  cell,
+  tableMeta,
+  rowIndex,
+  columnId,
+  rowHeight,
+  isFocused,
+  isEditing,
+  isSelected,
+  isSearchMatch,
+  isActiveSearchMatch,
+  readOnly,
+}: DataGridCellProps<TData>) {
+  const initialValue = cell.getValue() as number;
+  const [value, setValue] = React.useState(String(initialValue ?? ""));
+  const inputRef = React.useRef<HTMLInputElement>(null);
+  const containerRef = React.useRef<HTMLDivElement>(null);
+
+  const cellOpts = cell.column.columnDef.meta?.cell;
+  const intCellOpts = cellOpts?.variant === "int" ? cellOpts : null;
+  const min = intCellOpts?.min;
+  const max = intCellOpts?.max;
+  const step = intCellOpts?.step;
+
+  const prevIsEditingRef = React.useRef(false);
+
+  const prevInitialValueRef = React.useRef(initialValue);
+  if (!Object.is(initialValue, prevInitialValueRef.current)) {
+    prevInitialValueRef.current = initialValue;
+    setValue(String(initialValue ?? ""));
+  }
+
+  const onBlur = React.useCallback(() => {
+    const numValue = value === "" ? null : Number(value);
+    if (
+      !readOnly &&
+      !Number.isNaN(numValue) &&
+      !Object.is(numValue, initialValue)
+    ) {
+      tableMeta?.onDataUpdate?.({ rowIndex, columnId, value: numValue });
+    }
+    tableMeta?.onCellEditingStop?.();
+  }, [tableMeta, rowIndex, columnId, initialValue, value, readOnly]);
+
+  const onChange = React.useCallback(
+    (event: React.ChangeEvent<HTMLInputElement>) => {
+      setValue(event.target.value);
+    },
+    [],
+  );
+
+  const onWrapperKeyDown = React.useCallback(
+    (event: React.KeyboardEvent<HTMLDivElement>) => {
+      if (isEditing) {
+        if (event.key === "Enter") {
+          event.preventDefault();
+          const numValue = value === "" ? null : Number(value);
+          if (!Number.isNaN(numValue) && !Object.is(numValue, initialValue)) {
+            tableMeta?.onDataUpdate?.({ rowIndex, columnId, value: numValue });
+          }
+          tableMeta?.onCellEditingStop?.({ moveToNextRow: true });
+        } else if (event.key === "Tab") {
+          event.preventDefault();
+          const numValue = value === "" ? null : Number(value);
+          if (!Number.isNaN(numValue) && !Object.is(numValue, initialValue)) {
+            tableMeta?.onDataUpdate?.({ rowIndex, columnId, value: numValue });
+          }
+          tableMeta?.onCellEditingStop?.({
+            direction: event.shiftKey ? "left" : "right",
+          });
+        } else if (event.key === "Escape") {
+          event.preventDefault();
+          setValue(String(initialValue ?? ""));
+          inputRef.current?.blur();
+        }
+      } else if (isFocused && !readOnly) {
+        // Handle Backspace to start editing with empty value
+        if (event.key === "Backspace") {
+          setValue("");
+        } else if (
+          /^[0-9-]$/.test(event.key) &&
+          !event.ctrlKey &&
+          !event.metaKey
+        ) {
+          // Handle typing to pre-fill the value when editing starts
+          setValue(event.key);
+        }
+      }
+    },
+    [
+      isEditing,
+      isFocused,
+      readOnly,
+      initialValue,
+      tableMeta,
+      rowIndex,
+      columnId,
+      value,
+    ],
+  );
+
+  React.useEffect(() => {
+    const wasEditing = prevIsEditingRef.current;
+    prevIsEditingRef.current = isEditing;
+
+    // Only focus when we start editing (transition from false to true)
+    if (isEditing && !wasEditing && inputRef.current) {
+      inputRef.current.focus();
+    }
+  }, [isEditing]);
+
+  return (
+    <DataGridCellWrapper<TData>
+      ref={containerRef}
+      cell={cell}
+      tableMeta={tableMeta}
+      rowIndex={rowIndex}
+      columnId={columnId}
+      rowHeight={rowHeight}
+      isEditing={isEditing}
+      isFocused={isFocused}
+      isSelected={isSelected}
+      isSearchMatch={isSearchMatch}
+      isActiveSearchMatch={isActiveSearchMatch}
+      readOnly={readOnly}
+      onKeyDown={onWrapperKeyDown}
+    >
+      {isEditing ? (
+        <Input
+          type="int"
           ref={inputRef}
           value={value}
           min={min}
@@ -879,7 +1044,8 @@ export function SelectCell<TData>({
   isActiveSearchMatch,
   readOnly,
 }: DataGridCellProps<TData>) {
-  const initialValue = cell.getValue() as string;
+  const initialValue = (cell.getValue() ?? undefined) as string | undefined;
+
   const [value, setValue] = React.useState(initialValue);
   const containerRef = React.useRef<HTMLDivElement>(null);
   const cellOpts = cell.column.columnDef.meta?.cell;
@@ -935,7 +1101,9 @@ export function SelectCell<TData>({
     [isEditing, isFocused, initialValue, tableMeta],
   );
 
-  const displayLabel = optionByValue.get(value)?.label ?? value;
+  const displayLabel = value
+    ? (optionByValue.get(value)?.label ?? value)
+    : null;
 
   return (
     <DataGridCellWrapper<TData>
@@ -983,11 +1151,13 @@ export function SelectCell<TData>({
             sideOffset={-8}
             className="min-w-[calc(var(--radix-select-trigger-width)+16px)]"
           >
-            {options.map((option) => (
-              <SelectItem key={option.value} value={option.value}>
-                {option.label}
-              </SelectItem>
-            ))}
+            <SelectGroup>
+              {options.map((option) => (
+                <SelectItem key={option.value} value={option.value}>
+                  {option.label}
+                </SelectItem>
+              ))}
+            </SelectGroup>
           </SelectContent>
         </Select>
       ) : displayLabel ? (
@@ -1020,10 +1190,12 @@ export function ComboboxCell<TData>({
   const [value, setValue] = React.useState(initialValue);
   const containerRef = React.useRef<HTMLDivElement>(null);
   const cellOpts = cell.column.columnDef.meta?.cell;
-  const options = React.useMemo(
-    () => (cellOpts?.variant === "combobox" ? cellOpts.options : []),
-    [cellOpts],
-  );
+  const options = React.useMemo(() => {
+    if (cellOpts?.variant !== "combobox") return [];
+    return typeof cellOpts.options === "function"
+      ? cellOpts.options(cell.row.original, cell.row.index)
+      : cellOpts.options;
+  }, [cellOpts, cell.row.original, cell.row.index]);
   const optionByValue = React.useMemo(
     () => new Map(options.map((option) => [option.value, option])),
     [options],
@@ -1155,10 +1327,12 @@ export function MultiSelectCell<TData>({
   const containerRef = React.useRef<HTMLDivElement>(null);
   const inputRef = React.useRef<HTMLInputElement>(null);
   const cellOpts = cell.column.columnDef.meta?.cell;
-  const options = React.useMemo(
-    () => (cellOpts?.variant === "multi-select" ? cellOpts.options : []),
-    [cellOpts],
-  );
+  const options = React.useMemo(() => {
+    if (cellOpts?.variant !== "multi-select") return [];
+    return typeof cellOpts.options === "function"
+      ? cellOpts.options(cell.row.original, cell.row.index)
+      : cellOpts.options;
+  }, [cellOpts, cell.row.original, cell.row.index]);
   const optionByValue = React.useMemo(
     () => new Map(options.map((option) => [option.value, option])),
     [options],
