@@ -4,7 +4,7 @@ import { DataGrid } from "@/components/data-grid/data-grid";
 import { useDataGrid } from "../hooks/use-data-grid";
 import type { ColumnDef } from "@tanstack/react-table";
 import { CheckCircle, XCircle, AlertCircle, Pencil, Plus, X } from "lucide-react";
-import { Button } from "@/components/base";
+import { Button, Input } from "@/components/base";
 import { SimpleDialog } from "@/components/SimpleDialog";
 import type { FileCellData } from "@/types/data-grid";
 
@@ -464,8 +464,14 @@ function RichCellVariantsExample() {
           Add Column
         </Button>
       </div>
+      <div style={{ marginBottom: "12px", maxWidth: "300px" }}>
+        <Input placeholder="Input above grid (tab into grid from here)" />
+      </div>
       <div style={{ height: "560px" }}>
         <DataGrid table={table} stretchColumns  {...dataGridProps} />
+      </div>
+      <div style={{ marginTop: "12px", maxWidth: "300px" }}>
+        <Input placeholder="Input below grid (tab out of grid to here)" />
       </div>
     </div>
   );

@@ -22,6 +22,7 @@ import { useAsRef } from "./use-as-ref";
 import { useIsomorphicLayoutEffect } from "./use-isomorphic-layout-effect";
 import { useLazyRef } from "./use-lazy-ref";
 import {
+  getAdjacentFocusable,
   getCellKey,
   getEmptyCellValue,
   getIsFileCellData,
@@ -178,6 +179,7 @@ function useDataGrid<TData>({
   const rowMapRef = React.useRef<Map<number, HTMLDivElement>>(new Map());
   const cellMapRef = React.useRef<Map<string, HTMLDivElement>>(new Map());
   const footerRef = React.useRef<HTMLDivElement>(null);
+  const sentinelRef = React.useRef<HTMLDivElement>(null);
   const focusGuardRef = React.useRef(false);
 
   const propsRef = useAsRef({
@@ -2994,14 +2996,54 @@ function useDataGrid<TData>({
             blurCell();
           }
           return;
-        case "Tab":
-          event.preventDefault();
-          if (dir === "rtl") {
-            direction = event.shiftKey ? "right" : "left";
-          } else {
-            direction = event.shiftKey ? "left" : "right";
+        case "Tab": {
+          const forward = !shiftKey;
+          const colDelta =
+            dir === "rtl" ? (forward ? -1 : 1) : forward ? 1 : -1;
+          const startColumnId =
+            navigableColumnIds[colDelta > 0 ? 0 : navigableColumnIds.length - 1];
+
+          const currentColIndex = navigableColumnIds.indexOf(
+            currentState.focusedCell.columnId,
+          );
+          const newColIndex = currentColIndex + colDelta;
+
+          if (newColIndex >= 0 && newColIndex < navigableColumnIds.length) {
+            event.preventDefault();
+            const nextColumnId = navigableColumnIds[newColIndex];
+            if (nextColumnId) {
+              focusCell(currentState.focusedCell.rowIndex, nextColumnId);
+            }
+            return;
           }
-          break;
+
+          const rows = tableRef.current?.getRowModel().rows ?? [];
+          const rowCount = rows.length || propsRef.current.data.length;
+          const newRowIndex = currentState.focusedCell.rowIndex + (forward ? 1 : -1);
+
+          if (newRowIndex >= 0 && newRowIndex < rowCount && startColumnId) {
+            event.preventDefault();
+            focusCell(newRowIndex, startColumnId);
+            return;
+          }
+
+          // At the very first/last navigable cell: release focus and move it
+          // to the next/previous focusable element outside the grid. Done
+          // explicitly (rather than relying on the browser's own default Tab
+          // traversal) since native content inside cells can otherwise steal
+          // that traversal before it ever leaves the grid.
+          event.preventDefault();
+          blurCell();
+          const container = dataGridRef.current;
+          if (container) {
+            const target = getAdjacentFocusable(
+              container,
+              forward ? "next" : "prev",
+            );
+            target?.focus();
+          }
+          return;
+        }
       }
 
       if (direction) {
@@ -3352,6 +3394,44 @@ function useDataGrid<TData>({
       container.removeEventListener("focusout", onFocusOut);
     };
   }, [store]);
+
+  // Focus the first navigable cell when the grid container or the trailing
+  // tab sentinel receives focus (tabbing in from an element outside the
+  // grid, in either direction), since arrow-key and Tab navigation are both
+  // no-ops until a cell is focused.
+  //
+  // The sentinel is a hidden, always-tabbable element rendered as the very
+  // last node inside the grid container. Native content within cells (links,
+  // buttons, custom cell renderers) can be natively focusable, which would
+  // otherwise intercept Shift+Tab before it ever reaches the container. The
+  // sentinel sits after all of that in DOM order, so backward Tab traversal
+  // reaches it first. Both the container and the sentinel share the same
+  // `focusedCell ? -1 : 0` tabIndex, so whichever one native Tab lands on is
+  // only reachable when no cell is currently focused.
+  React.useEffect(() => {
+    const container = dataGridRef.current;
+    if (!container) return;
+
+    const sentinel = sentinelRef.current;
+
+    function onFocusIn(event: FocusEvent) {
+      if (event.target !== container && event.target !== sentinel) return;
+      if (store.getState().focusedCell) return;
+
+      const firstColumnId = navigableColumnIds[0];
+      if (!firstColumnId) return;
+
+      focusCell(0, firstColumnId);
+    }
+
+    container.addEventListener("focusin", onFocusIn);
+    sentinel?.addEventListener("focusin", onFocusIn);
+
+    return () => {
+      container.removeEventListener("focusin", onFocusIn);
+      sentinel?.removeEventListener("focusin", onFocusIn);
+    };
+  }, [store, navigableColumnIds, focusCell]);
 
   React.useEffect(() => {
     function onOutsideClick(event: MouseEvent) {
@@ -3721,6 +3801,7 @@ function useDataGrid<TData>({
       headerRef,
       rowMapRef,
       footerRef,
+      sentinelRef,
       dir,
       table,
       tableMeta,

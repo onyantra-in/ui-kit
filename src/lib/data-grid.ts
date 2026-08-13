@@ -378,6 +378,44 @@ export function getIsInPopover(element: unknown): boolean {
   );
 }
 
+const FOCUSABLE_SELECTOR =
+  'a[href], button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])';
+
+// Finds the next/previous focusable element in the document, outside of
+// `container`, in true document (tab) order. Used to exit the grid via Tab
+// without depending on the browser's own default Tab traversal, since that
+// traversal can land on elements inside the grid (e.g. natively focusable
+// cell content) that we don't control.
+export function getAdjacentFocusable(
+  container: HTMLElement,
+  direction: "next" | "prev",
+): HTMLElement | null {
+  const candidates = Array.from(
+    document.querySelectorAll<HTMLElement>(FOCUSABLE_SELECTOR),
+  ).filter((el) => !container.contains(el));
+
+  if (direction === "next") {
+    return (
+      candidates.find(
+        (el) =>
+          container.compareDocumentPosition(el) &
+          Node.DOCUMENT_POSITION_FOLLOWING,
+      ) ?? null
+    );
+  }
+
+  for (let i = candidates.length - 1; i >= 0; i--) {
+    const el = candidates[i];
+    if (
+      el &&
+      container.compareDocumentPosition(el) & Node.DOCUMENT_POSITION_PRECEDING
+    ) {
+      return el;
+    }
+  }
+  return null;
+}
+
 export function getColumnVariant(variant?: CellOpts["variant"]): {
   icon: React.ComponentType<React.SVGProps<SVGSVGElement>>;
   label: string;

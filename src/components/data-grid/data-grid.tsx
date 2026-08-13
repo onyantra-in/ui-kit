@@ -34,6 +34,7 @@ export function DataGrid<TData>({
   headerRef,
   rowMapRef,
   footerRef,
+  sentinelRef,
   dir = "ltr",
   table,
   tableMeta,
@@ -113,7 +114,7 @@ export function DataGrid<TData>({
         aria-rowcount={rows.length + (onRowAddProp ? 1 : 0)}
         aria-colcount={columns.length}
         data-slot="grid"
-        tabIndex={0}
+        tabIndex={focusedCell ? -1 : 0}
         ref={dataGridRef}
         className="relative grid select-none overflow-auto rounded-md border focus:outline-none"
         style={{
@@ -276,7 +277,7 @@ export function DataGrid<TData>({
             >
               <div
                 role="gridcell"
-                tabIndex={0}
+                tabIndex={-1}
                 className="relative flex h-9 grow items-center bg-muted/30 transition-colors hover:bg-muted/50 focus:bg-muted/50 focus:outline-none text-sm"
                 style={{
                   width: table.getTotalSize(),
@@ -293,6 +294,12 @@ export function DataGrid<TData>({
             </div>
           </div>
         )}
+        <div
+          data-slot="grid-tab-sentinel"
+          ref={sentinelRef}
+          tabIndex={focusedCell ? -1 : 0}
+          className="sr-only"
+        />
       </div>
     </div>
   );
