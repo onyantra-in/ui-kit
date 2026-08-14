@@ -1031,6 +1031,91 @@ export function CheckboxCell<TData>({
   );
 }
 
+/** A cell that fires a row-scoped callback (e.g. delete) — not a stored value, so `cell.getValue()` is unused. */
+export function ActionCell<TData>({
+  cell,
+  tableMeta,
+  rowIndex,
+  columnId,
+  rowHeight,
+  isFocused,
+  isSelected,
+  isSearchMatch,
+  isActiveSearchMatch,
+  readOnly,
+}: Omit<DataGridCellProps<TData>, "isEditing">) {
+  const containerRef = React.useRef<HTMLDivElement>(null);
+  const cellOpts = cell.column.columnDef.meta?.cell;
+  const { icon: Icon, label, onAction } =
+    cellOpts?.variant === "action"
+      ? cellOpts
+      : { icon: undefined, label: undefined, onAction: undefined };
+
+  const triggerAction = React.useCallback(() => {
+    if (readOnly || !onAction) return;
+    onAction(cell.row.original, rowIndex);
+  }, [readOnly, onAction, cell.row.original, rowIndex]);
+
+  const onWrapperKeyDown = React.useCallback(
+    (event: React.KeyboardEvent<HTMLDivElement>) => {
+      if (
+        isFocused &&
+        !readOnly &&
+        (event.key === " " || event.key === "Enter")
+      ) {
+        event.preventDefault();
+        event.stopPropagation();
+        triggerAction();
+      } else if (isFocused && event.key === "Tab") {
+        event.preventDefault();
+        tableMeta?.onCellEditingStop?.({
+          direction: event.shiftKey ? "left" : "right",
+        });
+      }
+    },
+    [isFocused, readOnly, triggerAction, tableMeta],
+  );
+
+  const onWrapperClick = React.useCallback(
+    (event: React.MouseEvent) => {
+      if (!readOnly) {
+        event.preventDefault();
+        event.stopPropagation();
+        triggerAction();
+      }
+    },
+    [readOnly, triggerAction],
+  );
+
+  if (!Icon) return null;
+
+  return (
+    <DataGridCellWrapper<TData>
+      ref={containerRef}
+      cell={cell}
+      tableMeta={tableMeta}
+      rowIndex={rowIndex}
+      columnId={columnId}
+      rowHeight={rowHeight}
+      isEditing={false}
+      isFocused={isFocused}
+      isSelected={isSelected}
+      isSearchMatch={isSearchMatch}
+      isActiveSearchMatch={isActiveSearchMatch}
+      readOnly={readOnly}
+      className="flex size-full items-center justify-center"
+      aria-label={label}
+      onClick={onWrapperClick}
+      onKeyDown={onWrapperKeyDown}
+    >
+      <Icon
+        aria-hidden="true"
+        className={cn("size-4", readOnly && "opacity-40")}
+      />
+    </DataGridCellWrapper>
+  );
+}
+
 export function SelectCell<TData>({
   cell,
   tableMeta,

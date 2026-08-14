@@ -70,6 +70,14 @@ export type CellOpts<TData = unknown> =
       maxFiles?: number;
       accept?: string;
       multiple?: boolean;
+    }
+  | {
+      variant: "action";
+      /** Rendered inside the cell, decorative — the cell itself carries the a11y label. */
+      icon: React.ComponentType<{ className?: string }>;
+      /** Announced as the cell's accessible name and used for the hover tooltip. */
+      label: string;
+      onAction: (row: TData, rowIndex: number) => void;
     };
 
 export interface CellUpdate {
