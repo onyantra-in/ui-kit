@@ -54,6 +54,7 @@ export {
   DataGridPresenceProvider,
   type DataGridCellPresence,
 } from "./components/data-grid/data-grid-presence";
+export { ComboGrid } from "./components/combo-grid/combo-grid";
 
 // Utilities
 export { cn, stringToHsl, stringToHslPair, formatDate, getAge } from './lib/utils';

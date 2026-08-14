@@ -1,4 +1,5 @@
-import type { Column, Table } from "@tanstack/react-table";
+import type { Column, FilterFn, Table } from "@tanstack/react-table";
+import { rankItem } from "@tanstack/match-sorter-utils";
 import {
   BaselineIcon,
   CalendarIcon,
@@ -62,6 +63,15 @@ export function matchSelectOption(
 
 export function getCellKey(rowIndex: number, columnId: string) {
   return `${rowIndex}:${columnId}`;
+}
+
+export function fuzzyFilter<TData>(
+  ...args: Parameters<FilterFn<TData>>
+): boolean {
+  const [row, columnId, value, addMeta] = args;
+  const itemRank = rankItem(row.getValue(columnId), value);
+  addMeta({ itemRank });
+  return itemRank.passed;
 }
 
 export function parseCellKey(cellKey: string): Required<CellPosition> {

@@ -2151,7 +2151,13 @@ function useDataGrid<TData>({
   const defaultColumn: Partial<ColumnDef<TData>> = React.useMemo(
     () => ({
       // Note: cell is rendered directly in DataGridRow to bypass flexRender's
-      // unstable cell.getContext() (see TanStack Table issue #4794)
+      // unstable cell.getContext() (see TanStack Table issue #4794). Must be
+      // explicitly undefined here — otherwise TanStack's own built-in default
+      // `cell` (a function) wins the columnDef merge for any column that
+      // doesn't set its own `cell`, which makes DataGridRow's `typeof cell
+      // === "function"` check misfire and silently skip DataGridCellWrapper
+      // (breaking cell focus/keyboard nav) for every such column.
+      cell: undefined,
       minSize: MIN_COLUMN_SIZE,
       maxSize: MAX_COLUMN_SIZE,
       enableHiding: false,
