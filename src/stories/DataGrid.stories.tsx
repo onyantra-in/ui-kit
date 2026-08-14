@@ -2,8 +2,8 @@ import type { Meta, StoryObj } from "@storybook/react";
 import * as React from "react";
 import { DataGrid } from "@/components/data-grid/data-grid";
 import { useDataGrid } from "../hooks/use-data-grid";
-import type { ColumnDef } from "@tanstack/react-table";
-import { CheckCircle, XCircle, AlertCircle, Pencil, Plus, X } from "lucide-react";
+import type { ColumnDef, Table } from "@tanstack/react-table";
+import { CheckCircle, XCircle, AlertCircle, Pencil, Plus, X, Trash2 } from "lucide-react";
 import { Button, Input } from "@/components/base";
 import { SimpleDialog } from "@/components/SimpleDialog";
 import type { FileCellData } from "@/types/data-grid";
@@ -226,6 +226,7 @@ function RichCellVariantsExample() {
   );
   const [extraColumns, setExtraColumns] = React.useState<DynamicColumn[]>([]);
   const nextIndexRef = React.useRef(1);
+  const tableRef = React.useRef<Table<RichTask> | null>(null);
 
   const addColumn = React.useCallback(() => {
     // Stable, unique id per column — never derived from array length/index,
@@ -400,6 +401,25 @@ function RichCellVariantsExample() {
         },
         size: 220,
       },
+      {
+        id: "delete",
+        header: "",
+        cell: undefined,
+        meta: {
+          cell: {
+            variant: "action",
+            icon: Trash2,
+            label: "Delete row",
+            onAction: (_row, rowIndex) => {
+              tableRef.current?.options.meta?.onRowsDelete?.([rowIndex]);
+            },
+          },
+        },
+        size: 48,
+        enableSorting: false,
+        enableHiding: false,
+        enablePinning: false,
+      },
       ...extraColumns.map(
         (col): ColumnDef<RichTask> => ({
           id: col.id,
@@ -455,6 +475,7 @@ function RichCellVariantsExample() {
       setData((prev) => prev.filter((row) => !idsToDelete.has(row.id)));
     },
   });
+  tableRef.current = table;
 
   return (
     <div style={{ padding: "20px" }}>

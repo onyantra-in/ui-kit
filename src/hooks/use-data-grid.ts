@@ -1254,6 +1254,22 @@ function useDataGrid<TData>({
         if (newRowCount > 0 && currentFocusedColumn) {
           const targetRowIndex = Math.min(minDeletedRowIndex, newRowCount - 1);
           focusCell(targetRowIndex, currentFocusedColumn);
+          return;
+        }
+
+        // Grid is now empty — clear the stale focused cell so Tab/arrow
+        // handling doesn't keep trying to refocus a deleted row (which
+        // traps focus, since that only re-triggers the container fallback
+        // and swallows the keystroke), and hand focus to the add-row
+        // button when there is one.
+        store.setState("focusedCell", null);
+        const addRowButton = footerRef.current?.querySelector<HTMLElement>(
+          '[role="gridcell"]',
+        );
+        if (addRowButton) {
+          addRowButton.focus();
+        } else {
+          dataGridRef.current?.focus();
         }
       });
     },
@@ -3381,6 +3397,36 @@ function useDataGrid<TData>({
 
           if (cellElement && document.body.contains(cellElement)) {
             cellElement.focus();
+            return;
+          }
+
+          // The focused cell's row is gone (e.g. removed via an action-cell
+          // callback outside the normal onRowsDelete flow) — fall back to
+          // the previous row's first cell instead of just parking focus on
+          // the container.
+          const currentTable = tableRef.current;
+          const rowCount = currentTable?.getRowModel().rows.length ?? 0;
+          const firstColumnId = navigableColumnIds[0];
+
+          if (rowCount > 0 && firstColumnId) {
+            const targetRowIndex = Math.min(
+              Math.max(rowIndex - 1, 0),
+              rowCount - 1,
+            );
+            focusCell(targetRowIndex, firstColumnId);
+            return;
+          }
+
+          // Grid is now empty — clear the stale focused cell (otherwise
+          // Tab/arrow handling keeps trying to refocus a deleted row,
+          // trapping focus in the container) and hand off to the add-row
+          // button when there is one.
+          store.setState("focusedCell", null);
+          const addRowButton = footerRef.current?.querySelector<HTMLElement>(
+            '[role="gridcell"]',
+          );
+          if (addRowButton) {
+            addRowButton.focus();
           } else {
             currentContainer.focus();
           }
@@ -3393,7 +3439,7 @@ function useDataGrid<TData>({
     return () => {
       container.removeEventListener("focusout", onFocusOut);
     };
-  }, [store]);
+  }, [store, focusCell, navigableColumnIds]);
 
   // Focus the first navigable cell when the grid container or the trailing
   // tab sentinel receives focus (tabbing in from an element outside the
@@ -3406,8 +3452,11 @@ function useDataGrid<TData>({
   // otherwise intercept Shift+Tab before it ever reaches the container. The
   // sentinel sits after all of that in DOM order, so backward Tab traversal
   // reaches it first. Both the container and the sentinel share the same
-  // `focusedCell ? -1 : 0` tabIndex, so whichever one native Tab lands on is
-  // only reachable when no cell is currently focused.
+  // `focusedCell || rows.length === 0 ? -1 : 0` tabIndex, so whichever one
+  // native Tab lands on is only reachable when no cell is focused and there
+  // are rows to focus — when the grid is empty, the add-row button is its
+  // own native tab stop instead (see data-grid.tsx), so neither this
+  // container nor the sentinel are reachable via Tab in that state.
   React.useEffect(() => {
     const container = dataGridRef.current;
     if (!container) return;
