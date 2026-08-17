@@ -89,7 +89,7 @@ export function parseCellKey(cellKey: string): Required<CellPosition> {
 
 export function getRowHeightValue(rowHeight: RowHeightValue): number {
   const rowHeightMap: Record<RowHeightValue, number> = {
-    short: 36,
+    short: 30,
     medium: 56,
     tall: 76,
     "extra-tall": 96,
@@ -384,7 +384,13 @@ export function getIsInPopover(element: unknown): boolean {
     element.closest("[data-grid-cell-editor]") !== null ||
     element.closest("[data-grid-popover]") !== null ||
     element.closest("[data-slot='dropdown-menu-content']") !== null ||
-    element.closest("[data-slot='popover-content']") !== null
+    element.closest("[data-slot='popover-content']") !== null ||
+    // A nested dialog opened from a grid cell (e.g. a "details" popup
+    // triggered by an action cell) is a deliberate focus destination, not
+    // focus escaping unexpectedly — without this, the grid's focusout
+    // handler below yanks focus straight back out of the dialog that just
+    // opened, on the very next frame.
+    element.closest("[data-slot='dialog-content']") !== null
   );
 }
 

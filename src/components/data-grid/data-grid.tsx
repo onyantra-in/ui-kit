@@ -10,6 +10,7 @@ import { DataGridRow } from "../data-grid/data-grid-row";
 import { DataGridSearch } from "../data-grid/data-grid-search";
 import { useAsRef } from "../../hooks/use-as-ref";
 import type { useDataGrid } from "../../hooks/use-data-grid";
+import { useComposedRefs } from "../../lib/compose-refs";
 import {
   flexRender,
   getColumnBorderVisibility,
@@ -31,6 +32,7 @@ interface DataGridProps<TData>
 
 export function DataGrid<TData>({
   dataGridRef,
+  onGridElementMount,
   headerRef,
   rowMapRef,
   footerRef,
@@ -67,6 +69,7 @@ export function DataGrid<TData>({
   const rowSelection = table.getState().rowSelection;
 
   const onRowAddRef = useAsRef(onRowAddProp);
+  const composedGridRef = useComposedRefs(dataGridRef, onGridElementMount);
 
   const onRowAdd = React.useCallback(
     (event: React.MouseEvent<HTMLDivElement>) => {
@@ -115,7 +118,7 @@ export function DataGrid<TData>({
         aria-colcount={columns.length}
         data-slot="grid"
         tabIndex={focusedCell || rows.length === 0 ? -1 : 0}
-        ref={dataGridRef}
+        ref={composedGridRef}
         className="relative grid select-none overflow-auto rounded-md border focus:outline-none"
         style={{
           ...columnSizeVars,

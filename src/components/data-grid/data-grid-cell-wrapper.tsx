@@ -176,7 +176,9 @@ export function DataGridCellWrapper<TData>({
       {...props}
       ref={composedRef}
       className={cn(
-        "size-full px-2 py-1.5 text-start text-sm outline-none has-data-[slot=checkbox]:pt-2.5",
+        rowHeight === "short"
+          ? "size-full px-2 py-1 text-start text-sm outline-none has-data-[slot=checkbox]:pt-1.5"
+          : "size-full px-2 py-1.5 text-start text-sm outline-none has-data-[slot=checkbox]:pt-2.5",
         {
           "ring-1 ring-inset": isFocused || !!cellPresence,
           "ring-ring": isFocused && !cellPresence,

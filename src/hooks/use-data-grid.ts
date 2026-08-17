@@ -172,6 +172,18 @@ function useDataGrid<TData>({
 }: UseDataGridProps<TData>) {
   const dir = useDirection(dirProp);
   const dataGridRef = React.useRef<HTMLDivElement>(null);
+  // Some hosts (e.g. a grid whose very first commit happens while it's
+  // still inside a not-yet-settled portal/dialog) don't have dataGridRef.current
+  // populated by the time the native-listener effect below first runs, and
+  // since that effect's deps never change again, it silently never retries —
+  // the grid renders but arrow-key nav, Shift+Enter-to-add-row, etc. go dead.
+  // This ref callback (composed onto the grid root in DataGrid) bumps a
+  // counter whenever the element actually mounts, so that effect can depend
+  // on real mount events instead of assuming dataGridRef is already live.
+  const [gridElementMountCount, setGridElementMountCount] = React.useState(0);
+  const onGridElementMount = React.useCallback((node: HTMLDivElement | null) => {
+    if (node) setGridElementMountCount((c) => c + 1);
+  }, []);
   const tableRef = React.useRef<ReturnType<typeof useReactTable<TData>>>(null);
   const rowVirtualizerRef =
     React.useRef<Virtualizer<HTMLDivElement, Element>>(null);
@@ -3278,7 +3290,10 @@ function useDataGrid<TData>({
     return () => {
       dataGridElement.removeEventListener("keydown", onDataGridKeyDown);
     };
-  }, [onDataGridKeyDown]);
+    // `gridElementMountCount` isn't read in the body — it's here purely to
+    // force a re-run once dataGridRef.current is actually populated (see the
+    // comment where it's declared).
+  }, [onDataGridKeyDown, gridElementMountCount]);
 
   React.useEffect(() => {
     function onGlobalKeyDown(event: KeyboardEvent) {
@@ -3853,6 +3868,7 @@ function useDataGrid<TData>({
   return React.useMemo(
     () => ({
       dataGridRef,
+      onGridElementMount,
       headerRef,
       rowMapRef,
       footerRef,

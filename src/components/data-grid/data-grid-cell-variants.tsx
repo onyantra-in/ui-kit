@@ -1246,13 +1246,12 @@ export function SelectCell<TData>({
           </SelectContent>
         </Select>
       ) : displayLabel ? (
-        <Badge
+        <span
           data-slot="grid-cell-content"
-          variant="secondary"
-          className="whitespace-pre-wrap px-1.5 py-px"
+          className="flex size-full items-center truncate"
         >
           {displayLabel}
-        </Badge>
+        </span>
       ) : null}
     </DataGridCellWrapper>
   );
@@ -1354,12 +1353,7 @@ export function ComboboxCell<TData>({
             className="flex size-full items-center overflow-hidden"
           >
             {displayLabel && (
-              <Badge
-                variant="secondary"
-                className="whitespace-pre-wrap px-1.5 py-px"
-              >
-                {displayLabel}
-              </Badge>
+              <span className="truncate">{displayLabel}</span>
             )}
           </span>
         </PopoverAnchor>
@@ -1666,24 +1660,18 @@ export function MultiSelectCell<TData>({
           </PopoverContent>
         </Popover>
       ) : null}
-      {displayLabels.length > 0 ? (
+      {!isEditing && displayLabels.length > 0 ? (
         <div className="flex flex-wrap items-center gap-1 overflow-hidden">
           {visibleLabels.map((label, index) => (
-            <Badge
-              key={selectedValues[index]}
-              variant="secondary"
-              className="px-1.5 py-px"
-            >
+            <span key={selectedValues[index]} className="truncate">
               {label}
-            </Badge>
+              {index < visibleLabels.length - 1 && ","}
+            </span>
           ))}
           {hiddenBadgeCount > 0 && (
-            <Badge
-              variant="outline"
-              className="px-1.5 py-px text-muted-foreground"
-            >
+            <span className="text-muted-foreground">
               +{hiddenBadgeCount}
-            </Badge>
+            </span>
           )}
         </div>
       ) : null}
