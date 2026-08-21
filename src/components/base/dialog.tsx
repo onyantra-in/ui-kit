@@ -6,6 +6,22 @@ import { Button } from "./button"
 import { XIcon } from "lucide-react"
 import { FocusScope } from "@radix-ui/react-focus-scope";
 
+/**
+ * Radix's modal Dialog.Content calls `hideOthers()` on mount, which makes
+ * every DOM node outside the content's subtree `inert` (unreachable to
+ * pointer/wheel input). Popovers/comboboxes that portal to `document.body`
+ * by default end up as *siblings* of the dialog content and get hidden too,
+ * so they stop responding to mouse input while still working via keyboard
+ * (keyboard-driven scrollIntoView is programmatic, not pointer-gated).
+ * Components that portal (e.g. ComboboxContent) read this context to default
+ * their portal container to the dialog content instead of `document.body`.
+ */
+const DialogContentContainerContext = React.createContext<HTMLElement | null>(null)
+
+function useDialogContentContainer() {
+  return React.useContext(DialogContentContainerContext)
+}
+
 function Dialog({
   ...props
 }: React.ComponentProps<typeof DialogPrimitive.Root>) {
@@ -50,15 +66,27 @@ function DialogContent({
   className,
   children,
   showCloseButton = true,
+  ref,
   ...props
 }: React.ComponentProps<typeof DialogPrimitive.Content> & {
   showCloseButton?: boolean
 }) {
+  const [contentElement, setContentElement] = React.useState<HTMLElement | null>(null)
+  const composedRef = React.useCallback(
+    (node: HTMLDivElement | null) => {
+      setContentElement(node)
+      if (typeof ref === "function") ref(node)
+      else if (ref) (ref as React.RefObject<HTMLDivElement | null>).current = node
+    },
+    [ref]
+  )
+
   return (
     <DialogPortal>
       <DialogOverlay onClick={(e)=>e.stopPropagation()} />
       <FocusScope trapped={false}>
       <DialogPrimitive.Content
+        ref={composedRef}
         data-slot="dialog-content"
         className={cn(
           "fixed top-1/2 left-1/2 z-50 flex flex-col w-full max-w-[calc(100%-2rem)] max-h-[calc(100svh-2rem)] -translate-x-1/2 -translate-y-1/2 gap-4 rounded-xl bg-popover p-4 text-sm text-popover-foreground ring-1 ring-foreground/10 duration-100 outline-none sm:max-w-sm md:max-w-3xl data-open:animate-in data-open:fade-in-0 data-open:zoom-in-95 data-closed:animate-out data-closed:fade-out-0 data-closed:zoom-out-95",
@@ -66,7 +94,9 @@ function DialogContent({
         )}
         {...props}
       >
-        {children}
+        <DialogContentContainerContext.Provider value={contentElement}>
+          {children}
+        </DialogContentContainerContext.Provider>
         {showCloseButton && (
           <DialogPrimitive.Close data-slot="dialog-close" asChild>
             <Button
@@ -166,4 +196,5 @@ export {
   DialogPortal,
   DialogTitle,
   DialogTrigger,
+  useDialogContentContainer,
 }

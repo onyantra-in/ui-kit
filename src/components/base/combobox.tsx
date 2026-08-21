@@ -5,6 +5,7 @@ import { Combobox as ComboboxPrimitive } from "@base-ui/react"
 
 import { cn } from "../../lib/utils"
 import { Button } from "./button"
+import { useDialogContentContainer } from "./dialog"
 import {
   InputGroup,
   InputGroupAddon,
@@ -102,8 +103,9 @@ function ComboboxContent({
   > & {
     container?: ComboboxPrimitive.Portal.Props["container"]
   }) {
+  const dialogContentContainer = useDialogContentContainer()
   return (
-    <ComboboxPrimitive.Portal container={container}>
+    <ComboboxPrimitive.Portal container={container ?? dialogContentContainer ?? undefined}>
       <ComboboxPrimitive.Positioner
         side={side}
         sideOffset={sideOffset}
