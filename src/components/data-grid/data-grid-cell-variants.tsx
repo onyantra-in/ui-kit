@@ -1359,7 +1359,8 @@ export function ComboboxCell<TData>({
     });
   }, []);
 
-  const displayLabel = optionByValue.get(value)?.label ?? value;
+  const selectedOption = optionByValue.get(value);
+  const displayLabel = selectedOption?.shortLabel ?? selectedOption?.label ?? value;
 
   return (
     <DataGridCellWrapper<TData>

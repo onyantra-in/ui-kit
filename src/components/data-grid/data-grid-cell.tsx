@@ -31,13 +31,28 @@ export const DataGridCell = React.memo(DataGridCellImpl, (prev, next) => {
   if (prev.rowHeight !== next.rowHeight) return false;
 
   // Check cell value using row.original instead of getValue() for stability
-  // getValue() is unstable and recreates on every render, breaking memoization
-  const prevValue = (prev.cell.row.original as Record<string, unknown>)[
-    prev.columnId
-  ];
-  const nextValue = (next.cell.row.original as Record<string, unknown>)[
-    next.columnId
-  ];
+  // getValue() is unstable and recreates on every render, breaking memoization.
+  // Columns defined via accessorFn (no matching key on row.original — e.g. a
+  // derived/lookup display column) must run that function to get a real
+  // value; indexing row.original by columnId for them is always undefined on
+  // both sides, so the cell would never invalidate until an unrelated prop
+  // (like isFocused) happened to change it.
+  const prevAccessorFn = (
+    prev.cell.column.columnDef as {
+      accessorFn?: (row: unknown, index: number) => unknown;
+    }
+  ).accessorFn;
+  const nextAccessorFn = (
+    next.cell.column.columnDef as {
+      accessorFn?: (row: unknown, index: number) => unknown;
+    }
+  ).accessorFn;
+  const prevValue = prevAccessorFn
+    ? prevAccessorFn(prev.cell.row.original, prev.cell.row.index)
+    : (prev.cell.row.original as Record<string, unknown>)[prev.columnId];
+  const nextValue = nextAccessorFn
+    ? nextAccessorFn(next.cell.row.original, next.cell.row.index)
+    : (next.cell.row.original as Record<string, unknown>)[next.columnId];
   if (prevValue !== nextValue) {
     return false;
   }

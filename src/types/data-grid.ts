@@ -9,6 +9,10 @@ export interface CellSelectOption {
   value: string;
   icon?: React.FC<React.SVGProps<SVGSVGElement>>;
   count?: number;
+  /** Shown in the collapsed cell instead of `label` when set — e.g. a plain
+   *  code, while `label` carries extra detail (like a quantity) for the
+   *  dropdown list only. Combobox/select variants only. */
+  shortLabel?: string;
 }
 
 export type CellOpts<TData = unknown> =
