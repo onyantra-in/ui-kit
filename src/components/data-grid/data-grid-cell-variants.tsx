@@ -1274,6 +1274,7 @@ export function ComboboxCell<TData>({
   const [value, setValue] = React.useState(initialValue);
   const [pendingChar, setPendingChar] = React.useState<string | null>(null);
   const containerRef = React.useRef<HTMLDivElement>(null);
+  const popoverContentRef = React.useRef<HTMLDivElement>(null);
   const cellOpts = cell.column.columnDef.meta?.cell;
   const options = React.useMemo(() => {
     if (cellOpts?.variant !== "combobox") return [];
@@ -1342,6 +1343,22 @@ export function ComboboxCell<TData>({
     [isEditing, isFocused, readOnly, initialValue, tableMeta],
   );
 
+  // The combobox's own autofocus selects the seeded text (it's built to let a
+  // click-to-open user overwrite the current value). For a typed-char open we
+  // want the opposite — cursor after the char, ready to keep typing — so take
+  // over focus and collapse the selection once the default focus has landed.
+  const onPopoverOpenAutoFocus = React.useCallback((event: Event) => {
+    event.preventDefault();
+    requestAnimationFrame(() => {
+      const input = popoverContentRef.current?.querySelector("input");
+      if (input) {
+        input.focus();
+        const length = input.value.length;
+        input.setSelectionRange(length, length);
+      }
+    });
+  }, []);
+
   const displayLabel = optionByValue.get(value)?.label ?? value;
 
   return (
@@ -1373,11 +1390,13 @@ export function ComboboxCell<TData>({
         </PopoverAnchor>
         {isEditing && (
           <PopoverContent
+            ref={popoverContentRef}
             data-grid-cell-editor=""
             align="start"
             alignOffset={-8}
             sideOffset={-8}
             className="w-[240px] p-1"
+            onOpenAutoFocus={onPopoverOpenAutoFocus}
           >
             <SimpleCombobox
               options={options}
