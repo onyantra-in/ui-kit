@@ -1272,6 +1272,7 @@ export function ComboboxCell<TData>({
 }: DataGridCellProps<TData>) {
   const initialValue = cell.getValue() as string;
   const [value, setValue] = React.useState(initialValue);
+  const [pendingChar, setPendingChar] = React.useState<string | null>(null);
   const containerRef = React.useRef<HTMLDivElement>(null);
   const cellOpts = cell.column.columnDef.meta?.cell;
   const options = React.useMemo(() => {
@@ -1306,6 +1307,7 @@ export function ComboboxCell<TData>({
       if (open && !readOnly) {
         tableMeta?.onCellEditingStart?.(rowIndex, columnId);
       } else {
+        setPendingChar(null);
         tableMeta?.onCellEditingStop?.();
       }
     },
@@ -1323,9 +1325,21 @@ export function ComboboxCell<TData>({
         tableMeta?.onCellEditingStop?.({
           direction: event.shiftKey ? "left" : "right",
         });
+      } else if (
+        isFocused &&
+        !isEditing &&
+        !readOnly &&
+        event.key.length === 1 &&
+        !event.ctrlKey &&
+        !event.metaKey
+      ) {
+        // Seed the popover's search input with the character that opened it —
+        // the shared cell wrapper otherwise swallows this keystroke (it just
+        // preventDefaults and starts editing), same fix as LongTextCell.
+        setPendingChar(event.key);
       }
     },
-    [isEditing, isFocused, initialValue, tableMeta],
+    [isEditing, isFocused, readOnly, initialValue, tableMeta],
   );
 
   const displayLabel = optionByValue.get(value)?.label ?? value;
@@ -1371,6 +1385,7 @@ export function ComboboxCell<TData>({
               onValueChange={onValueChange}
               placeholder="Search…"
               defaultOpen
+              defaultInputValue={pendingChar ?? undefined}
             />
           </PopoverContent>
         )}

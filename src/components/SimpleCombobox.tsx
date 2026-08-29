@@ -25,6 +25,8 @@ interface SimpleComboboxBaseProps {
   disabled?: boolean;
   showClear?: boolean;
   defaultOpen?: boolean;
+  /** Seeds the search input on mount — e.g. a character typed to open the combobox. */
+  defaultInputValue?: string;
 }
 
 export interface SimpleComboboxSingleProps extends SimpleComboboxBaseProps {
@@ -52,6 +54,7 @@ export function SimpleCombobox(props: SimpleComboboxProps) {
     disabled,
     showClear,
     defaultOpen,
+    defaultInputValue,
   } = props;
 
   if (props.multiple) {
@@ -70,6 +73,7 @@ export function SimpleCombobox(props: SimpleComboboxProps) {
           items={options}
           value={selectedOptions}
           defaultOpen={defaultOpen}
+          defaultInputValue={defaultInputValue}
           onValueChange={(opts) => onValueChange?.((opts ?? []).map((o) => o.value))}
         >
           <ComboboxInput
@@ -106,6 +110,7 @@ export function SimpleCombobox(props: SimpleComboboxProps) {
         items={options}
         value={selectedOption}
         defaultOpen={defaultOpen}
+        defaultInputValue={defaultInputValue}
         onValueChange={(opt) => onValueChange?.(opt?.value ?? "")}
       >
         <ComboboxInput
