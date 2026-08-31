@@ -1,4 +1,4 @@
-import { type ReactNode } from "react";
+import { type ReactNode, useEffect, useRef } from "react";
 import { Button } from "@onyantra-in/ui-kit/base";
 import { cn } from "../lib/utils";
 import {
@@ -45,6 +45,38 @@ export function SimpleDrawer({
   footerClassName,
   showCloseButton = true,
 }: SimpleDrawerProps) {
+  const contentRef = useRef<HTMLDivElement>(null);
+
+  // On mobile, vaul keeps the bottom sheet anchored near the bottom of the
+  // screen even as the keyboard opens, so the keyboard can end up covering
+  // the sheet entirely. When that happens, pin the sheet to the top of the
+  // *visible* viewport (above the keyboard) instead, so there's still room
+  // to see and use the fields. Reset once the keyboard closes.
+  useEffect(() => {
+    const viewport = typeof window !== "undefined" ? window.visualViewport : undefined;
+    if (!viewport) return;
+
+    const onResize = () => {
+      const el = contentRef.current;
+      if (!el) return;
+      const keyboardHeight = window.innerHeight - viewport.height;
+      if (keyboardHeight > 150) {
+        el.style.top = "0px";
+        el.style.bottom = "auto";
+        el.style.height = `${viewport.height}px`;
+        el.style.maxHeight = `${viewport.height}px`;
+      } else {
+        el.style.top = "";
+        el.style.bottom = "";
+        el.style.height = "";
+        el.style.maxHeight = "";
+      }
+    };
+
+    viewport.addEventListener("resize", onResize);
+    return () => viewport.removeEventListener("resize", onResize);
+  }, []);
+
   return (
     // disablePreventScroll={false} despite the name: vaul's iOS scroll-lock
     // guard is active whenever disablePreventScroll is true (the default),
@@ -57,7 +89,7 @@ export function SimpleDrawer({
       disablePreventScroll={false}
     >
       {trigger && <DrawerTrigger asChild>{trigger}</DrawerTrigger>}
-      <DrawerContent>
+      <DrawerContent ref={contentRef}>
         <div
           className={cn("mx-auto w-full max-w-4xl flex flex-col flex-1 min-h-0", contentClassName)}
           style={{ maxHeight }}
