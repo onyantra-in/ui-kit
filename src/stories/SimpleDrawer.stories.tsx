@@ -82,3 +82,33 @@ export const NoDescription: Story = {
     children: <p className="text-sm text-muted-foreground">No description variant.</p>,
   },
 };
+
+export const MobileKeyboard: Story = {
+  parameters: {
+    viewport: {
+      defaultViewport: 'mobile1',
+    },
+    docs: {
+      description: {
+        story:
+          'Open on a phone/simulator and focus a lower field. The sheet should shift to the top of the visible viewport instead of staying anchored under the keyboard.',
+      },
+    },
+  },
+  render: () => (
+    <SimpleDrawer
+      trigger={<Button>Open form</Button>}
+      title="Contact details"
+      description="Focus a field near the bottom to trigger the keyboard."
+    >
+      <div className="space-y-3">
+        <LabeledInput label="Name" placeholder="Your name" />
+        <LabeledInput label="Email" type="email" placeholder="you@example.com" />
+        <LabeledInput label="Phone" placeholder="Phone number" />
+        <LabeledInput label="Address" placeholder="Street address" />
+        <LabeledInput label="City" placeholder="City" />
+        <LabeledInput label="Notes" placeholder="Anything else?" />
+      </div>
+    </SimpleDrawer>
+  ),
+};
