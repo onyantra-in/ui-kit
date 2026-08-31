@@ -46,25 +46,51 @@ export function SimpleDrawer({
   showCloseButton = true,
 }: SimpleDrawerProps) {
   const contentRef = useRef<HTMLDivElement>(null);
+  const bodyRef = useRef<HTMLDivElement>(null);
 
   // On mobile, vaul keeps the bottom sheet anchored near the bottom of the
   // screen even as the keyboard opens, so the keyboard can end up covering
   // the sheet entirely. When that happens, pin the sheet to the top of the
   // *visible* viewport (above the keyboard) instead, so there's still room
   // to see and use the fields. Reset once the keyboard closes.
+  //
+  // Setting disablePreventScroll={false} below also turns off vaul's own
+  // focus/scroll-into-view handling (it lives in the same guarded code
+  // path), so a half-covered focused field is scrolled fully into view here.
   useEffect(() => {
     const viewport = typeof window !== "undefined" ? window.visualViewport : undefined;
     if (!viewport) return;
 
-    const onResize = () => {
+    const KEYBOARD_THRESHOLD = 150;
+    const SCROLL_BUFFER = 16;
+
+    const isFormField = (el: Element): el is HTMLElement =>
+      el instanceof HTMLInputElement ||
+      el instanceof HTMLTextAreaElement ||
+      (el instanceof HTMLElement && el.isContentEditable);
+
+    const scrollFocusedFieldIntoView = () => {
+      const body = bodyRef.current;
+      const active = document.activeElement;
+      if (!body || !active || !isFormField(active) || !body.contains(active)) return;
+      const rect = active.getBoundingClientRect();
+      if (rect.bottom > viewport.height - SCROLL_BUFFER) {
+        body.scrollTop += rect.bottom - (viewport.height - SCROLL_BUFFER);
+      } else if (rect.top < SCROLL_BUFFER) {
+        body.scrollTop -= SCROLL_BUFFER - rect.top;
+      }
+    };
+
+    const applyKeyboardOffset = () => {
       const el = contentRef.current;
       if (!el) return;
-      const keyboardHeight = window.innerHeight - viewport.height;
-      if (keyboardHeight > 150) {
+      const keyboardOpen = window.innerHeight - viewport.height > KEYBOARD_THRESHOLD;
+      if (keyboardOpen) {
         el.style.top = "0px";
         el.style.bottom = "auto";
         el.style.height = `${viewport.height}px`;
         el.style.maxHeight = `${viewport.height}px`;
+        requestAnimationFrame(scrollFocusedFieldIntoView);
       } else {
         el.style.top = "";
         el.style.bottom = "";
@@ -73,8 +99,16 @@ export function SimpleDrawer({
       }
     };
 
-    viewport.addEventListener("resize", onResize);
-    return () => viewport.removeEventListener("resize", onResize);
+    // Tabbing/next-field to another input doesn't resize the viewport (the
+    // keyboard is already open), so re-check on every focus change too.
+    const onFocusIn = () => requestAnimationFrame(scrollFocusedFieldIntoView);
+
+    viewport.addEventListener("resize", applyKeyboardOffset);
+    document.addEventListener("focusin", onFocusIn);
+    return () => {
+      viewport.removeEventListener("resize", applyKeyboardOffset);
+      document.removeEventListener("focusin", onFocusIn);
+    };
   }, []);
 
   return (
@@ -106,7 +140,7 @@ export function SimpleDrawer({
             )}
           </DrawerHeader>
           {children && (
-            <div className="flex-1 overflow-y-auto p-4">
+            <div ref={bodyRef} className="flex-1 overflow-y-auto p-4">
               {children}
             </div>
           )}
