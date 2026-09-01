@@ -74,6 +74,7 @@ export function SimpleCombobox(props: SimpleComboboxProps) {
           value={selectedOptions}
           defaultOpen={defaultOpen}
           defaultInputValue={defaultInputValue}
+          autoHighlight="always"
           onValueChange={(opts) => onValueChange?.((opts ?? []).map((o) => o.value))}
         >
           <ComboboxInput
@@ -111,6 +112,7 @@ export function SimpleCombobox(props: SimpleComboboxProps) {
         value={selectedOption}
         defaultOpen={defaultOpen}
         defaultInputValue={defaultInputValue}
+        autoHighlight="always"
         onValueChange={(opt) => onValueChange?.(opt?.value ?? "")}
       >
         <ComboboxInput
