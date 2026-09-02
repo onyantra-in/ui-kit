@@ -1,6 +1,7 @@
 "use client";
 
 import type {
+  ColumnDef,
   ColumnPinningState,
   Row,
   TableMeta,
@@ -26,6 +27,7 @@ import type {
 
 interface DataGridRowProps<TData> extends React.ComponentProps<"div"> {
   row: Row<TData>;
+  columns: ColumnDef<TData>[];
   tableMeta: TableMeta<TData>;
   virtualItem: VirtualItem;
   measureElement: (node: Element | null) => void;
@@ -56,6 +58,13 @@ export const DataGridRow = React.memo(DataGridRowImpl, (prev, next) => {
 
   // Re-render if row data (original) reference changed
   if (prev.row.original !== next.row.original) {
+    return false;
+  }
+
+  // Re-render if column defs changed (e.g. async-loaded dropdown/combobox
+  // options resolved into meta.cell.options) — the row/original data can be
+  // unchanged while only the columns array is replaced with a new reference.
+  if (prev.columns !== next.columns) {
     return false;
   }
 
@@ -156,6 +165,7 @@ export const DataGridRow = React.memo(DataGridRowImpl, (prev, next) => {
 
 function DataGridRowImpl<TData>({
   row,
+  columns,
   tableMeta,
   virtualItem,
   measureElement,
@@ -200,10 +210,13 @@ function DataGridRowImpl<TData>({
 
   // Memoize visible cells to avoid recreating cell array on every render
   // Though TanStack returns new Cell wrappers, memoizing the array helps React's reconciliation
+  // `columns` is included so cells rebind to fresh columnDefs once async-loaded
+  // dropdown/combobox options resolve, even though `row` identity itself is
+  // unaffected by a columns-only change (core row model only memoizes on data).
   // biome-ignore lint/correctness/useExhaustiveDependencies: columnVisibility and columnPinning are used for calculating the visible cells
   const visibleCells = React.useMemo(
     () => row.getVisibleCells(),
-    [row, columnVisibility, columnPinning],
+    [row, columns, columnVisibility, columnPinning],
   );
 
   return (

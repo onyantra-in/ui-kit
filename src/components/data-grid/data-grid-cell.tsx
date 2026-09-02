@@ -60,6 +60,17 @@ export const DataGridCell = React.memo(DataGridCellImpl, (prev, next) => {
   // Check cell/row identity
   if (prev.cell.row.id !== next.cell.row.id) return false;
 
+  // Re-render if the column's cell config changed (e.g. async-loaded
+  // dropdown/combobox `options` resolved) even though the stored value
+  // itself (the raw id/uuid) is unchanged — otherwise select/combobox cells
+  // keep showing the raw id until something else forces a re-render.
+  if (
+    prev.cell.column.columnDef.meta?.cell !==
+    next.cell.column.columnDef.meta?.cell
+  ) {
+    return false;
+  }
+
   return true;
 }) as typeof DataGridCellImpl;
 

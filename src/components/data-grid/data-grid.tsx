@@ -243,6 +243,7 @@ export function DataGrid<TData>({
               <DataGridRow
                 key={row.id}
                 row={row}
+                columns={columns}
                 tableMeta={tableMeta}
                 rowMapRef={rowMapRef}
                 virtualItem={virtualItem}
