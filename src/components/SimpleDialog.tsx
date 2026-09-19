@@ -26,6 +26,7 @@ export interface SimpleDialogProps {
   restoreFocusRef?: RefObject<HTMLElement | null>;
   showCloseButton?: boolean;
   contentClassName?: string;
+  titleClassName?: string;
 }
 
 export function SimpleDialog({
@@ -40,6 +41,7 @@ export function SimpleDialog({
   restoreFocusRef,
   showCloseButton = true,
   contentClassName,
+  titleClassName,
 }: SimpleDialogProps) {
   const handleClose = (e: Event) => {
     if (onClose?.() === false) e.preventDefault();
@@ -70,7 +72,7 @@ export function SimpleDialog({
         onFocusOutside={(e) => e.preventDefault()}
       >
         <DialogHeader>
-          <DialogTitle>{title}</DialogTitle>
+          <DialogTitle className={titleClassName}>{title}</DialogTitle>
           {description && <DialogDescription>{description}</DialogDescription>}
         </DialogHeader>
         <div className="flex-1 min-h-0 overflow-y-auto p-1">{children}</div>
