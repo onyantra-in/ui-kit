@@ -1891,6 +1891,18 @@ function useDataGrid<TData>({
 
       if (propsRef.current.enableRowClickSelection) return;
 
+      const currentState = store.getState();
+      const { editingCell } = currentState;
+
+      if (
+        editingCell &&
+        (editingCell.rowIndex !== rowIndex ||
+          editingCell.columnId !== columnId) &&
+        document.activeElement instanceof HTMLElement
+      ) {
+        document.activeElement.blur();
+      }
+
       event.preventDefault();
 
       if (!event.ctrlKey && !event.metaKey && !event.shiftKey) {

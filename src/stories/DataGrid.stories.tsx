@@ -220,9 +220,23 @@ interface DynamicColumn {
   label: string;
 }
 
+const HOURLY_RATE = 100;
+
 function RichCellVariantsExample() {
   const [data, setData] = React.useState<RichTask[]>(() =>
     initialTaskData.map((task) => ({ ...task, priority: [task.priority] }) as RichTask),
+  );
+
+  // "cost" is derived from "estimate" on every render to simulate a
+  // dependent/calculated field — it must recompute on Tab/Enter commit
+  // AND on click-away commit.
+  const dataWithCost = React.useMemo(
+    () =>
+      data.map((row) => ({
+        ...row,
+        cost: (Number(row.estimate) || 0) * HOURLY_RATE,
+      })),
+    [data],
   );
   const [extraColumns, setExtraColumns] = React.useState<DynamicColumn[]>([]);
   const nextIndexRef = React.useRef(1);
@@ -348,6 +362,19 @@ function RichCellVariantsExample() {
         size: 100,
       },
       {
+        id: "cost",
+        accessorKey: "cost",
+        header: "Cost ($)",
+        cell: undefined,
+        meta: {
+          cell: {
+            variant: "number",
+          },
+          readOnly: true,
+        },
+        size: 100,
+      },
+      {
         id: "assignee",
         accessorKey: "assignee",
         header: "Assignee",
@@ -447,7 +474,7 @@ function RichCellVariantsExample() {
   );
 
   const { table, ...dataGridProps } = useDataGrid({
-    data,
+    data: dataWithCost,
     columns,
     onDataChange: setData,
     getRowId: (row) => row.id,
