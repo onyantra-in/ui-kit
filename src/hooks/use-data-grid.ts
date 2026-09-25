@@ -1568,6 +1568,37 @@ function useDataGrid<TData>({
       } else if (opts?.direction && currentEditing) {
         const { rowIndex, columnId } = currentEditing;
         focusCell(rowIndex, columnId);
+
+        const currentColIndex = navigableColumnIds.indexOf(columnId);
+        const isLastColumn = currentColIndex === navigableColumnIds.length - 1;
+        const rows = tableRef.current?.getRowModel().rows ?? [];
+        const rowCount = rows.length || propsRef.current.data.length;
+        const isLastRow = rowIndex === rowCount - 1;
+        const startColumnId = navigableColumnIds[0];
+
+        if (
+          opts.direction === "right" &&
+          isLastColumn &&
+          isLastRow &&
+          propsRef.current.onRowAdd &&
+          !propsRef.current.readOnly &&
+          startColumnId
+        ) {
+          Promise.resolve(propsRef.current.onRowAdd())
+            .then((result) => {
+              if (result === null) return;
+              const targetRowIndex = result?.rowIndex ?? rowCount;
+              const targetColumnId = result?.columnId ?? startColumnId;
+              requestAnimationFrame(() => {
+                focusCell(targetRowIndex, targetColumnId);
+              });
+            })
+            .catch(() => {
+              // Callback threw an error, don't proceed with focus
+            });
+          return;
+        }
+
         requestAnimationFrame(() => {
           navigateCell(opts.direction ?? "right");
         });
@@ -1576,7 +1607,7 @@ function useDataGrid<TData>({
         focusCellWrapper(rowIndex, columnId);
       }
     },
-    [store, propsRef, focusCell, navigateCell, focusCellWrapper],
+    [store, propsRef, focusCell, navigateCell, focusCellWrapper, navigableColumnIds],
   );
 
   const onSearchOpenChange = React.useCallback(
@@ -3070,6 +3101,30 @@ function useDataGrid<TData>({
           if (newRowIndex >= 0 && newRowIndex < rowCount && startColumnId) {
             event.preventDefault();
             focusCell(newRowIndex, startColumnId);
+            return;
+          }
+
+          if (
+            forward &&
+            newRowIndex >= rowCount &&
+            propsRef.current.onRowAdd &&
+            !propsRef.current.readOnly &&
+            startColumnId
+          ) {
+            event.preventDefault();
+            Promise.resolve(propsRef.current.onRowAdd())
+              .then((result) => {
+                if (result === null) return;
+                const targetRowIndex = result?.rowIndex ?? rowCount;
+                const targetColumnId = result?.columnId ?? startColumnId;
+                onScrollToRow({
+                  rowIndex: targetRowIndex,
+                  columnId: targetColumnId,
+                });
+              })
+              .catch(() => {
+                // Callback threw an error, don't proceed with scroll/focus
+              });
             return;
           }
 
