@@ -281,7 +281,7 @@ function DataGridColumnResizerImpl<TData, TValue>({
     <div
       role="separator"
       aria-orientation="vertical"
-      aria-label={`Resize ${label} column`}
+      aria-label={`Resize column`}
       aria-valuenow={header.column.getSize()}
       aria-valuemin={defaultColumnDef.minSize}
       aria-valuemax={defaultColumnDef.maxSize}
