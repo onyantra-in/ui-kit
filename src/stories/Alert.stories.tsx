@@ -8,7 +8,7 @@ const meta: Meta<typeof Alert> = {
   component: Alert,
   tags: ['autodocs'],
   argTypes: {
-    variant: { control: 'select', options: ['default', 'destructive'] },
+    variant: { control: 'select', options: ['default', 'destructive', 'info', 'warning'] },
   },
 };
 

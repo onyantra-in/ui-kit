@@ -1,6 +1,6 @@
 // ─── Simple prop-driven wrappers ──────────────────────────────────────────────
 export { SimpleAlert } from './components/SimpleAlert';
-export type { SimpleAlertProps } from './components/SimpleAlert';
+export type { SimpleAlertProps, SimpleAlertType } from './components/SimpleAlert';
 
 export { SimpleBadge } from './components/SimpleBadge';
 export type { SimpleBadgeProps } from './components/SimpleBadge';
