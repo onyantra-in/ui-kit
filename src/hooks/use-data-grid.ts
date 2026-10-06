@@ -158,6 +158,11 @@ interface UseDataGridProps<TData>
   enablePaste?: boolean;
   enableRowClickSelection?: boolean;
   onRowKeyDown?: (event: KeyboardEvent, rowData: TData) => void;
+  /**
+   * Marks a data row as a separator: rendered full-width (no cells) and skipped
+   * by keyboard navigation. Pass the same predicate to `<DataGrid>`.
+   */
+  isSeparatorRow?: (rowData: TData) => boolean;
   readOnly?: boolean;
 }
 
@@ -1408,6 +1413,23 @@ function useDataGrid<TData>({
           break;
       }
 
+      const isSeparatorRow = propsRef.current.isSeparatorRow;
+      if (isSeparatorRow && newRowIndex !== rowIndex) {
+        const step = newRowIndex > rowIndex ? 1 : -1;
+        let candidate = newRowIndex;
+        while (
+          candidate >= 0 &&
+          candidate < rowCount &&
+          rows[candidate] &&
+          isSeparatorRow(rows[candidate]!.original)
+        ) {
+          candidate += step;
+        }
+        // Nothing focusable in that direction: stay put vertically.
+        newRowIndex =
+          candidate >= 0 && candidate < rowCount ? candidate : rowIndex;
+      }
+
       if (newRowIndex !== rowIndex || newColumnId !== columnId) {
         focusCell(newRowIndex, newColumnId);
 
@@ -2618,6 +2640,14 @@ function useDataGrid<TData>({
       const { key, ctrlKey, metaKey, shiftKey, altKey } = event;
       const isCtrlPressed = ctrlKey || metaKey;
 
+      // Separator rows host their own inputs; leave their keys alone.
+      if (
+        event.target instanceof Element &&
+        event.target.closest('[data-slot="grid-separator"]')
+      ) {
+        return;
+      }
+
       if (
         propsRef.current.enableSearch &&
         isCtrlPressed &&
@@ -3096,7 +3126,16 @@ function useDataGrid<TData>({
 
           const rows = tableRef.current?.getRowModel().rows ?? [];
           const rowCount = rows.length || propsRef.current.data.length;
-          const newRowIndex = currentState.focusedCell.rowIndex + (forward ? 1 : -1);
+          let newRowIndex = currentState.focusedCell.rowIndex + (forward ? 1 : -1);
+          const isSeparatorRow = propsRef.current.isSeparatorRow;
+          if (isSeparatorRow) {
+            while (
+              rows[newRowIndex] &&
+              isSeparatorRow(rows[newRowIndex]!.original)
+            ) {
+              newRowIndex += forward ? 1 : -1;
+            }
+          }
 
           if (newRowIndex >= 0 && newRowIndex < rowCount && startColumnId) {
             event.preventDefault();
@@ -3959,6 +3998,7 @@ function useDataGrid<TData>({
       pasteDialog,
       onRowAdd: propsRef.current.onRowAdd ? onRowAdd : undefined,
       adjustLayout,
+      isSeparatorRow: propsRef.current.isSeparatorRow,
     }),
     [
       propsRef,

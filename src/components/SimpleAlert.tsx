@@ -6,7 +6,7 @@ export type SimpleAlertType = "info" | "error" | "warning";
 
 export interface SimpleAlertProps {
   title?: string;
-  description?: string;
+  description?: ReactNode;
   type?: SimpleAlertType;
   icon?: ReactNode;
   action?: ReactNode;

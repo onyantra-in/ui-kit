@@ -7,6 +7,7 @@ import { DataGridColumnHeader } from "../data-grid/data-grid-column-header";
 import { DataGridContextMenu } from "../data-grid/data-grid-context-menu";
 import { DataGridPasteDialog } from "../data-grid/data-grid-paste-dialog";
 import { DataGridRow } from "../data-grid/data-grid-row";
+import { DataGridSeparatorRow } from "../data-grid/data-grid-separator-row";
 import { DataGridSearch } from "../data-grid/data-grid-search";
 import { useAsRef } from "../../hooks/use-as-ref";
 import type { useDataGrid } from "../../hooks/use-data-grid";
@@ -28,6 +29,15 @@ interface DataGridProps<TData>
   loading?: boolean;
   maxHeight?: string | null;
   stretchColumns?: boolean;
+  /** Title shown on a separator row (rows matched by `isSeparatorRow`). */
+  getSeparatorTitle?: (rowData: TData) => React.ReactNode;
+  /**
+   * Custom separator content (e.g. an input). Replaces the title. Interactive
+   * content is isolated from grid keyboard handling.
+   */
+  renderSeparator?: (rowData: TData, rowIndex: number) => React.ReactNode;
+  /** Extra classes for separator rows; a function allows per-row styling. */
+  separatorClassName?: string | ((rowData: TData) => string | undefined);
 }
 
 export function DataGrid<TData>({
@@ -59,6 +69,10 @@ export function DataGrid<TData>({
   maxHeight,
   stretchColumns = false,
   adjustLayout = false,
+  isSeparatorRow,
+  getSeparatorTitle,
+  renderSeparator,
+  separatorClassName,
   className,
   ...props
 }: DataGridProps<TData>) {
@@ -229,6 +243,27 @@ export function DataGrid<TData>({
           {virtualItems.map((virtualItem) => {
             const row = rows[virtualItem.index];
             if (!row) return null;
+
+            if (isSeparatorRow?.(row.original)) {
+              return (
+                <DataGridSeparatorRow
+                  key={row.id}
+                  row={row}
+                  virtualItem={virtualItem}
+                  measureElement={measureElement}
+                  rowMapRef={rowMapRef}
+                  rowHeight={rowHeight}
+                  adjustLayout={adjustLayout}
+                  title={getSeparatorTitle?.(row.original)}
+                  content={renderSeparator?.(row.original, virtualItem.index)}
+                  className={
+                    typeof separatorClassName === "function"
+                      ? separatorClassName(row.original)
+                      : separatorClassName
+                  }
+                />
+              );
+            }
 
             const cellSelectionKeys =
               cellSelectionMap?.get(virtualItem.index) ??

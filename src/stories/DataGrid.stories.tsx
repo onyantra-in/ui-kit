@@ -1140,3 +1140,206 @@ export const OneToMany: Story = {
     },
   },
 };
+
+// ─── Separator + Auto Distribute ──────────────────────────────────────────────
+
+interface AllocationRow {
+  id: string;
+  kind: "separator" | "item";
+  /** Source row: qty to distribute. Target row: its allocated qty. */
+  qty: number;
+  name: string;
+  /** Used by weighted distribution. */
+  weight: number;
+}
+
+/** Splits `total` across `targets`; returns one qty per target. */
+type DistributeFn = (total: number, targets: AllocationRow[]) => number[];
+
+const distributeEvenly: DistributeFn = (total, targets) => {
+  if (targets.length === 0) return [];
+  const base = Math.floor(total / targets.length);
+  const remainder = total - base * targets.length;
+  // Leftover units go to the first rows so the sum always equals `total`.
+  return targets.map((_, i) => base + (i < remainder ? 1 : 0));
+};
+
+const distributeByWeight: DistributeFn = (total, targets) => {
+  const totalWeight = targets.reduce((sum, t) => sum + t.weight, 0);
+  if (totalWeight <= 0) return distributeEvenly(total, targets);
+  const shares = targets.map((t) => Math.floor((total * t.weight) / totalWeight));
+  let leftover = total - shares.reduce((a, b) => a + b, 0);
+  for (let i = 0; leftover > 0; i = (i + 1) % shares.length, leftover--) {
+    shares[i]! += 1;
+  }
+  return shares;
+};
+
+const initialAllocationData: AllocationRow[] = [
+  { id: "src", kind: "item", name: "Source stock", qty: 100, weight: 0 },
+  { id: "sep", kind: "separator", name: "Distributed to", qty: 0, weight: 0 },
+  { id: "a1", kind: "item", name: "Warehouse North", qty: 34, weight: 1 },
+  { id: "a2", kind: "item", name: "Warehouse South", qty: 33, weight: 2 },
+  { id: "a3", kind: "item", name: "Warehouse East", qty: 33, weight: 3 },
+];
+
+const isAllocationSeparator = (row: AllocationRow) => row.kind === "separator";
+
+/**
+ * For every separator whose preceding (source) row changed qty, redistributes
+ * that qty over the rows after the separator, up to the next separator.
+ */
+function redistribute(
+  prev: AllocationRow[],
+  next: AllocationRow[],
+  fn: DistributeFn,
+): AllocationRow[] {
+  let result = next;
+  next.forEach((row, i) => {
+    if (row.kind !== "separator" || i === 0) return;
+    const source = next[i - 1]!;
+    if (source.kind === "separator" || source.qty === prev[i - 1]?.qty) return;
+    let end = i + 1;
+    while (end < next.length && next[end]!.kind !== "separator") end++;
+    const shares = fn(source.qty, next.slice(i + 1, end));
+    result = result.map((r, j) =>
+      j > i && j < end ? { ...r, qty: shares[j - i - 1] ?? 0 } : r,
+    );
+  });
+  return result;
+}
+
+function AutoDistributeExample() {
+  const [data, setData] = React.useState(initialAllocationData);
+  const [mode, setMode] = React.useState<"even" | "weight">("even");
+  const distribute = mode === "even" ? distributeEvenly : distributeByWeight;
+
+  const onDataChange = React.useCallback(
+    (next: AllocationRow[]) => {
+      setData((prev) => redistribute(prev, next, distribute));
+    },
+    [distribute],
+  );
+
+  const columns = React.useMemo<ColumnDef<AllocationRow>[]>(
+    () => [
+      {
+        id: "name",
+        accessorKey: "name",
+        header: "Location",
+        size: 220,
+        meta: { cell: { variant: "short-text" } },
+      },
+      {
+        id: "weight",
+        accessorKey: "weight",
+        header: "Weight",
+        size: 100,
+        meta: { cell: { variant: "int", min: 0 } },
+      },
+      {
+        id: "qty",
+        accessorKey: "qty",
+        header: "Qty",
+        size: 120,
+        meta: { cell: { variant: "int", min: 0 } },
+      },
+    ],
+    [],
+  );
+
+  const { table, ...dataGridProps } = useDataGrid({
+    data,
+    columns,
+    onDataChange,
+    getRowId: (row) => row.id,
+    enableRowClickSelection: false,
+    isSeparatorRow: isAllocationSeparator,
+  });
+
+  return (
+    <div style={{ padding: "20px" }}>
+      <div className="mb-3 flex items-center gap-2 text-sm">
+        <span>Distribution:</span>
+        <Button
+          size="sm"
+          variant={mode === "even" ? "default" : "outline"}
+          onClick={() => setMode("even")}
+        >
+          Even
+        </Button>
+        <Button
+          size="sm"
+          variant={mode === "weight" ? "default" : "outline"}
+          onClick={() => setMode("weight")}
+        >
+          By weight
+        </Button>
+      </div>
+      <div style={{ height: "400px" }}>
+        <DataGrid
+          table={table}
+          {...dataGridProps}
+          stretchColumns
+          getSeparatorTitle={(row) => row.name}
+        />
+      </div>
+    </div>
+  );
+}
+
+function TitledSeparatorExample() {
+  const [data, setData] = React.useState(initialAllocationData);
+  const columns = React.useMemo<ColumnDef<AllocationRow>[]>(
+    () => [
+      { id: "name", accessorKey: "name", header: "Location", size: 220, meta: { cell: { variant: "short-text" } } },
+      { id: "qty", accessorKey: "qty", header: "Qty", size: 120, meta: { cell: { variant: "int", min: 0 } } },
+    ],
+    [],
+  );
+  const { table, ...dataGridProps } = useDataGrid({
+    data,
+    columns,
+    onDataChange: setData,
+    getRowId: (row) => row.id,
+    enableRowClickSelection: false,
+    isSeparatorRow: isAllocationSeparator,
+  });
+  return (
+    <div style={{ padding: "20px" }}>
+      <div style={{ height: "400px" }}>
+        <DataGrid
+          table={table}
+          {...dataGridProps}
+          stretchColumns
+          // Return nothing for a plain line separator.
+          getSeparatorTitle={(row) => (row.id === "s2" ? undefined : row.name)}
+        />
+      </div>
+    </div>
+  );
+}
+
+export const SeparatorWithTitle: Story = {
+  render: () => <TitledSeparatorExample />,
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "Rows matched by `isSeparatorRow` (passed to both `useDataGrid` and `DataGrid`) render full-width instead of as cells and are skipped by arrow/Tab navigation. `getSeparatorTitle` supplies an optional title; returning `undefined` renders a thin plain line.",
+      },
+    },
+  },
+};
+
+export const SeparatorAutoDistribute: Story = {
+  render: () => <AutoDistributeExample />,
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "Section 1 is a single source row; the separator splits it from section 2, the target rows. Editing the source qty runs a pluggable `DistributeFn(total, targets) => number[]` over the rows after the separator. Swap between even and weight-proportional split; both keep the sum equal to the source qty. Targets stay editable.",
+      },
+    },
+  },
+};
