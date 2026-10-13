@@ -41,6 +41,11 @@ export type { SimpleComboboxProps, ComboboxOption } from './components/SimpleCom
 // ─── Other components ─────────────────────────────────────────────────────────
 export * as Form from './components/Form';
 
+export { InputDate, InputDateBoundsProvider } from './components/InputDate';
+export type { InputDateProps, InputDateBounds } from './components/InputDate';
+export { parseDateText, isoToDisplay, checkDateBounds } from './lib/date-input';
+export type { DateParseResult, DateBounds } from './lib/date-input';
+
 export { VoiceMicButton } from './components/VoiceMicButton';
 export type { VoiceMicButtonProps } from './components/VoiceMicButton';
 
