@@ -67,6 +67,7 @@ function DialogContent({
   children,
   showCloseButton = true,
   ref,
+  onEscapeKeyDown,
   ...props
 }: React.ComponentProps<typeof DialogPrimitive.Content> & {
   showCloseButton?: boolean
@@ -87,6 +88,15 @@ function DialogContent({
       <FocusScope trapped={false}>
       <DialogPrimitive.Content
         ref={composedRef}
+        onEscapeKeyDown={(e) => {
+          // Esc on an open dropdown/combobox should only close that popup.
+          const t = e.target as HTMLElement | null
+          if (t?.closest?.('[aria-expanded="true"]')) {
+            e.preventDefault()
+            return
+          }
+          onEscapeKeyDown?.(e)
+        }}
         data-slot="dialog-content"
         className={cn(
           "fixed top-1/2 left-1/2 z-50 flex flex-col w-full max-w-[calc(100%-2rem)] max-h-[calc(100svh-2rem)] -translate-x-1/2 -translate-y-1/2 gap-4 rounded-xl bg-popover p-4 text-sm text-popover-foreground ring-1 ring-foreground/10 duration-100 outline-none sm:max-w-sm md:max-w-3xl data-open:animate-in data-open:fade-in-0 data-open:zoom-in-95 data-closed:animate-out data-closed:fade-out-0 data-closed:zoom-out-95",

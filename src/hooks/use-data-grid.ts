@@ -64,6 +64,16 @@ const NON_NAVIGABLE_COLUMN_IDS = new Set(["select", "actions"]);
 // land on a cell with no DOM node to focus, which silently drops focus
 // navigation for the rest of the grid. Exclude any such column here instead
 // of relying on consumers naming it "actions"/"select".
+// Grouped (header-only) columns wrap leaf columns in `columns`; only leaves are navigable.
+function flattenLeafColumns<T>(cols: T[]): T[] {
+  return cols.flatMap((c) => {
+    const children = (c as { columns?: T[] }).columns;
+    return Array.isArray(children) && children.length > 0
+      ? flattenLeafColumns(children)
+      : [c];
+  });
+}
+
 function hasCustomCellRenderer(c: { cell?: unknown }): boolean {
   return typeof c.cell === "function";
 }
@@ -380,7 +390,7 @@ function useDataGrid<TData>({
   );
 
   const columnIds = React.useMemo(() => {
-    return columns
+    return flattenLeafColumns(columns)
       .map((c) => {
         if (c.id) return c.id;
         if ("accessorKey" in c) return c.accessorKey as string;
@@ -391,7 +401,7 @@ function useDataGrid<TData>({
 
   const navigableColumnIds = React.useMemo(() => {
     const customCellColumnIds = new Set(
-      columns.filter(hasCustomCellRenderer).map((c) => {
+      flattenLeafColumns(columns).filter(hasCustomCellRenderer).map((c) => {
         if (c.id) return c.id;
         if ("accessorKey" in c) return c.accessorKey as string;
         return undefined;
@@ -2504,7 +2514,7 @@ function useDataGrid<TData>({
 
       focusGuardRef.current = true;
 
-      const navigableIds = propsRef.current.columns
+      const navigableIds = flattenLeafColumns(propsRef.current.columns)
         .filter((c) => !hasCustomCellRenderer(c))
         .map((c) => {
           if (c.id) return c.id;
