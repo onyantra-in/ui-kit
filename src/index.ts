@@ -35,8 +35,8 @@ export type { SimpleTabsProps, TabItem } from './components/SimpleTabs';
 export { SimpleDropdownMenu } from './components/SimpleDropdownMenu';
 export type { SimpleDropdownMenuProps, MenuGroup, MenuItemDef } from './components/SimpleDropdownMenu';
 
-export { SimpleCombobox } from './components/SimpleCombobox';
-export type { SimpleComboboxProps, ComboboxOption } from './components/SimpleCombobox';
+export { SimpleCombobox, fuzzyComboboxFilter } from './components/SimpleCombobox';
+export type { SimpleComboboxProps, ComboboxOption, ComboboxFilter, ComboboxFilterLabel } from './components/SimpleCombobox';
 
 // ─── Other components ─────────────────────────────────────────────────────────
 export * as Form from './components/Form';

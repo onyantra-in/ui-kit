@@ -9,11 +9,27 @@ import {
 } from "./base/combobox";
 import { Label } from "./base/label";
 import { cn } from "../lib/utils";
+import { rankItem } from "@tanstack/match-sorter-utils";
 
 export interface ComboboxOption {
   value: string;
   label: string;
 }
+
+export type ComboboxFilter = (
+  option: ComboboxOption,
+  query: string,
+) => boolean;
+
+/** Returns the text the default fuzzy filter matches against. */
+export type ComboboxFilterLabel = (option: ComboboxOption) => string;
+
+/** Fuzzy match on `getText(option)` (default `label`) — e.g. "52" matches "5,235/-". */
+export const fuzzyComboboxFilter = (
+  option: ComboboxOption,
+  query: string,
+  getText: ComboboxFilterLabel = (o) => o.label,
+): boolean => !query || rankItem(getText(option), query).passed;
 
 interface SimpleComboboxBaseProps {
   options: ComboboxOption[];
@@ -27,6 +43,10 @@ interface SimpleComboboxBaseProps {
   defaultOpen?: boolean;
   /** Seeds the search input on mount — e.g. a character typed to open the combobox. */
   defaultInputValue?: string;
+  /** Custom option filter. Overrides `filterLabel`. Defaults to fuzzy match. */
+  filter?: ComboboxFilter;
+  /** Text to fuzzy-match each option against instead of `label`. */
+  filterLabel?: ComboboxFilterLabel;
 }
 
 export interface SimpleComboboxSingleProps extends SimpleComboboxBaseProps {
@@ -55,7 +75,10 @@ export function SimpleCombobox(props: SimpleComboboxProps) {
     showClear,
     defaultOpen,
     defaultInputValue,
+    filterLabel,
   } = props;
+  const filter: ComboboxFilter =
+    props.filter ?? ((option, query) => fuzzyComboboxFilter(option, query, filterLabel));
 
   if (props.multiple) {
     const { value = [], onValueChange } = props;
@@ -75,6 +98,7 @@ export function SimpleCombobox(props: SimpleComboboxProps) {
           defaultOpen={defaultOpen}
           defaultInputValue={defaultInputValue}
           autoHighlight="always"
+          filter={filter}
           onValueChange={(opts) => onValueChange?.((opts ?? []).map((o) => o.value))}
         >
           <ComboboxInput
@@ -113,6 +137,7 @@ export function SimpleCombobox(props: SimpleComboboxProps) {
         defaultOpen={defaultOpen}
         defaultInputValue={defaultInputValue}
         autoHighlight="always"
+        filter={filter}
         onValueChange={(opt) => onValueChange?.(opt?.value ?? "")}
       >
         <ComboboxInput
