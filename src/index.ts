@@ -46,6 +46,9 @@ export type { InputDateProps, InputDateBounds } from './components/InputDate';
 export { parseDateText, isoToDisplay, checkDateBounds } from './lib/date-input';
 export type { DateParseResult, DateBounds } from './lib/date-input';
 
+export { NetworkStatusBar } from './components/NetworkStatusBar';
+export type { NetworkStatusBarProps } from './components/NetworkStatusBar';
+
 export { VoiceMicButton } from './components/VoiceMicButton';
 export type { VoiceMicButtonProps } from './components/VoiceMicButton';
 
