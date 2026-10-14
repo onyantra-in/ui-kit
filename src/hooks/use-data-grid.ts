@@ -1596,6 +1596,8 @@ function useDataGrid<TData>({
           requestAnimationFrame(() => {
             focusCell(nextRowIndex, columnId);
           });
+        } else {
+          focusCellWrapper(rowIndex, columnId);
         }
       } else if (opts?.direction && currentEditing) {
         const { rowIndex, columnId } = currentEditing;
