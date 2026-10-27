@@ -134,7 +134,7 @@ export function SimpleDrawer({
               {description && <DrawerDescription>{description}</DrawerDescription>}
             </div>
             {showCloseButton && (
-              <DrawerClose className="shrink-0 w-8 h-8 text-xl font-bold text-gray-500 hover:text-gray-700">
+              <DrawerClose className="shrink-0 size-(--control-h) text-xl font-bold text-gray-500 hover:text-gray-700">
                 ×
               </DrawerClose>
             )}

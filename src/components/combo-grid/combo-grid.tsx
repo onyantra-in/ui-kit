@@ -227,7 +227,7 @@ export function ComboGrid<TData>({
           autoCapitalize="off"
           spellCheck={false}
           placeholder={searchPlaceholder}
-          className="h-7 flex-1 border-none bg-transparent px-0 shadow-none focus-visible:ring-0"
+          className="h-(--control-h-sm) flex-1 border-none bg-transparent px-0 shadow-none focus-visible:ring-0"
           value={query}
           onChange={onQueryChange}
           onKeyDown={onKeyDown}
@@ -237,7 +237,7 @@ export function ComboGrid<TData>({
             aria-label="Clear search"
             variant="ghost"
             size="icon"
-            className="size-6 shrink-0"
+            className="size-(--control-h-xs) shrink-0"
             onClick={onClear}
           >
             <X />

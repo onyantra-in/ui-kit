@@ -169,7 +169,7 @@ function DataGridSearchImpl({
           autoCapitalize="off"
           spellCheck={false}
           placeholder="Find in table..."
-          className="h-8 w-64"
+          className="h-(--control-h) w-64"
           ref={inputRef}
           defaultValue={searchQuery}
           onChange={onChange}
@@ -182,7 +182,7 @@ function DataGridSearchImpl({
             aria-label="Previous match"
             variant="ghost"
             size="icon"
-            className="size-7"
+            className="size-(--control-h-sm)"
             onClick={onPrevMatch}
             onPointerDown={onTriggerPointerDown}
             disabled={searchMatches.length === 0}
@@ -193,7 +193,7 @@ function DataGridSearchImpl({
             aria-label="Next match"
             variant="ghost"
             size="icon"
-            className="size-7"
+            className="size-(--control-h-sm)"
             onClick={onNextMatch}
             onPointerDown={onTriggerPointerDown}
             disabled={searchMatches.length === 0}
@@ -204,7 +204,7 @@ function DataGridSearchImpl({
             aria-label="Close search"
             variant="ghost"
             size="icon"
-            className="size-7"
+            className="size-(--control-h-sm)"
             onClick={onClose}
           >
             <X />

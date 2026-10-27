@@ -128,7 +128,73 @@
     --sidebar-ring: var(--ring);
 }
 
+/*
+ * Density tokens. With no data-density attribute the density follows the
+ * input method (compact for mouse, touch for coarse pointers). Set
+ * data-density="compact" | "comfortable" | "touch" on <html> or any wrapper
+ * element to force a preset for that subtree.
+ */
+:root {
+  --control-h-xs: 1.5rem;
+  --control-h-sm: 1.75rem;
+  --control-h: 2rem;
+  --control-h-lg: 2.25rem;
+  --text-xs: 0.75rem;
+  --text-xs--line-height: calc(1 / 0.75);
+  --text-sm: 0.875rem;
+  --text-sm--line-height: calc(1.25 / 0.875);
+}
+
+@media (pointer: coarse) {
+  :root {
+    --control-h-xs: 2.25rem;
+    --control-h-sm: 2.5rem;
+    --control-h: 2.75rem;
+    --control-h-lg: 3rem;
+    --text-xs: 0.8125rem;
+    --text-xs--line-height: 1.25rem;
+    --text-sm: 1rem;
+    --text-sm--line-height: 1.5rem;
+  }
+}
+
+[data-density="compact"] {
+  --control-h-xs: 1.5rem;
+  --control-h-sm: 1.75rem;
+  --control-h: 2rem;
+  --control-h-lg: 2.25rem;
+  --text-xs: 0.75rem;
+  --text-xs--line-height: calc(1 / 0.75);
+  --text-sm: 0.875rem;
+  --text-sm--line-height: calc(1.25 / 0.875);
+}
+
+[data-density="comfortable"] {
+  --control-h-xs: 1.75rem;
+  --control-h-sm: 2rem;
+  --control-h: 2.25rem;
+  --control-h-lg: 2.5rem;
+  --text-xs: 0.75rem;
+  --text-xs--line-height: calc(1 / 0.75);
+  --text-sm: 0.9375rem;
+  --text-sm--line-height: 1.375rem;
+}
+
+[data-density="touch"] {
+  --control-h-xs: 2.25rem;
+  --control-h-sm: 2.5rem;
+  --control-h: 2.75rem;
+  --control-h-lg: 3rem;
+  --text-xs: 0.8125rem;
+  --text-xs--line-height: 1.25rem;
+  --text-sm: 1rem;
+  --text-sm--line-height: 1.5rem;
+}
+
 @layer base {
+  html {
+    -webkit-text-size-adjust: 100%;
+  }
   * {
     @apply border-border outline-ring/50;
     }

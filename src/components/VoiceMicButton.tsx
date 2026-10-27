@@ -41,7 +41,7 @@ export function VoiceMicButton({
         type="button"
         disabled
         title={notSupportedLabel}
-        className={`flex items-center justify-center w-7 h-7 rounded-full text-gray-300 cursor-not-allowed ${className}`}
+        className={`flex items-center justify-center size-(--control-h-sm) rounded-full text-gray-300 cursor-not-allowed ${className}`}
         aria-label={notSupportedLabel}
       >
         <MicOff size={14} />
@@ -65,7 +65,7 @@ export function VoiceMicButton({
       }
       aria-label={isListening ? stopListeningLabel : tapToSpeakLabel}
       className={[
-        'flex items-center justify-center w-7 h-7 rounded-full transition-all focus:outline-none focus:ring-2 focus:ring-offset-1 focus:ring-primary',
+        'flex items-center justify-center size-(--control-h-sm) rounded-full transition-all focus:outline-none focus:ring-2 focus:ring-offset-1 focus:ring-primary',
         isListening
           ? 'bg-red-500 text-white animate-pulse shadow-md shadow-red-200'
           : isError
