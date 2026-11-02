@@ -4,9 +4,18 @@ import { Drawer as DrawerPrimitive } from "vaul"
 import { cn } from "../../lib/utils"
 
 function Drawer({
+  // vaul's own input repositioning fights the visualViewport handling in
+  // DrawerContent below; opt back in with `repositionInputs` if needed.
+  repositionInputs = false,
   ...props
 }: React.ComponentProps<typeof DrawerPrimitive.Root>) {
-  return <DrawerPrimitive.Root data-slot="drawer" {...props} />
+  return (
+    <DrawerPrimitive.Root
+      data-slot="drawer"
+      repositionInputs={repositionInputs}
+      {...props}
+    />
+  )
 }
 
 function DrawerTrigger({
@@ -43,16 +52,71 @@ function DrawerOverlay({
   )
 }
 
+/**
+ * Keeps a bottom drawer usable with the on-screen keyboard. The keyboard
+ * shrinks the *visual* viewport (iOS leaves the layout viewport untouched),
+ * so the drawer is pinned to the visual viewport's bottom edge and capped
+ * to its height: the header stays on screen and only the body scrolls.
+ * Pair with `interactive-widget=resizes-content` in the viewport meta for
+ * Android Chrome.
+ *
+ * Layout contract for children: header (no scroll), a
+ * `min-h-0 flex-1 overflow-y-auto` body, then footer.
+ */
+function useKeyboardAwareStyle(
+  style: React.CSSProperties | undefined
+): React.CSSProperties | undefined {
+  const [inset, setInset] = React.useState<React.CSSProperties>()
+
+  React.useEffect(() => {
+    const vv = window.visualViewport
+    if (!vv) return
+    const update = () =>
+      setInset({
+        bottom: Math.max(0, window.innerHeight - vv.offsetTop - vv.height),
+        maxHeight: vv.height * 0.95,
+      })
+    update()
+    vv.addEventListener("resize", update)
+    vv.addEventListener("scroll", update)
+    return () => {
+      vv.removeEventListener("resize", update)
+      vv.removeEventListener("scroll", update)
+    }
+  }, [])
+
+  return { ...inset, ...style }
+}
+
 const DrawerContent = React.forwardRef<
   React.ElementRef<typeof DrawerPrimitive.Content>,
   React.ComponentProps<typeof DrawerPrimitive.Content>
->(function DrawerContent({ className, children, ...props }, ref) {
+>(function DrawerContent(
+  { className, children, style, onFocus, ...props },
+  ref
+) {
+  const keyboardStyle = useKeyboardAwareStyle(style)
+
+  // Bring a focused field to the middle of the visible area once the
+  // keyboard animation has settled.
+  const handleFocus = (e: React.FocusEvent<HTMLDivElement>) => {
+    onFocus?.(e)
+    const el = e.target
+    if (!/^(INPUT|TEXTAREA|SELECT)$/.test(el.tagName)) return
+    setTimeout(
+      () => el.scrollIntoView({ block: "center", behavior: "smooth" }),
+      300
+    )
+  }
+
   return (
     <DrawerPortal data-slot="drawer-portal">
       <DrawerOverlay />
       <DrawerPrimitive.Content
         ref={ref}
         data-slot="drawer-content"
+        style={keyboardStyle}
+        onFocus={handleFocus}
         className={cn(
           "group/drawer-content fixed z-50 flex h-auto flex-col bg-popover text-sm text-popover-foreground data-[vaul-drawer-direction=bottom]:inset-x-0 data-[vaul-drawer-direction=bottom]:bottom-0 data-[vaul-drawer-direction=bottom]:mt-24 data-[vaul-drawer-direction=bottom]:max-h-[95dvh] data-[vaul-drawer-direction=bottom]:rounded-t-xl data-[vaul-drawer-direction=bottom]:border-t data-[vaul-drawer-direction=left]:inset-y-0 data-[vaul-drawer-direction=left]:left-0 data-[vaul-drawer-direction=left]:w-3/4 data-[vaul-drawer-direction=left]:rounded-r-xl data-[vaul-drawer-direction=left]:border-r data-[vaul-drawer-direction=right]:inset-y-0 data-[vaul-drawer-direction=right]:right-0 data-[vaul-drawer-direction=right]:w-3/4 data-[vaul-drawer-direction=right]:rounded-l-xl data-[vaul-drawer-direction=right]:border-l data-[vaul-drawer-direction=top]:inset-x-0 data-[vaul-drawer-direction=top]:top-0 data-[vaul-drawer-direction=top]:mb-24 data-[vaul-drawer-direction=top]:max-h-[95dvh] data-[vaul-drawer-direction=top]:rounded-b-xl data-[vaul-drawer-direction=top]:border-b data-[vaul-drawer-direction=left]:sm:max-w-sm data-[vaul-drawer-direction=right]:sm:max-w-sm",
           className
